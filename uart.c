@@ -20,11 +20,14 @@ int uart_is_recv_enable()
 unsigned char uart_rx()
 {
   volatile unsigned char *rx = UART_BASE_ADDR;
+  volatile unsigned char *fcr = UART_BASE_ADDR + NS16550_FCR;
   unsigned char c;
 
   while(!uart_is_recv_enable()) { // 文字が来るまで待つ
+    // uart_tx('1');
     ;
   }
+  // uart_tx('!');
   c = *rx;
 
   return c;

@@ -12,7 +12,7 @@ OBJDUMP	= $(BINDIR)/$(ADDNAME)objdump
 RANLIB 	= $(BINDIR)/$(ADDNAME)ranlib
 STRIP  	= $(BINDIR)/$(ADDNAME)strip
 
-OBJS = start.o main.o lib.o uart.o putchar.o
+OBJS = start.o main.o lib.o uart.o
 
 TARGET = testboot
 
