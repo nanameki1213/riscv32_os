@@ -3,32 +3,44 @@ ENTRY(_start)
 
 MEMORY
 {
-  rom(rxa) : ORIGIN = 0x80000000, LENGTH = 512K
-  ram(wxa) : ORIGIN = 0x80080000, LENGTH = 512K
+  ram(rxa)      : o = 0x80000000, l = 0x100000
+  intrstack(rw) : o = 0x80100000, l = 0x050000
+  bootstack(rw) : o = 0x80150000, l = 0x0
 }
 
 SECTIONS
 {
-  . = 0x8000000;
-
-  
-
   .text : {
+    text_start = . ;
     *(.text)
-  }
+    etext = . ;
+  } > ram
 
   .rodata : {
+    rodata_start = . ;
     *(.strings)
     *(.rodata)
     *(.rodata.*)
-  }
+    erodata = . ;
+  } > ram
 
   .data : {
     *(.data)
-  }
+  } > ram
 
   .bss : {
     *(.bss)
     *(COMMON)
-  }
+  } > ram
+
+  . = ALIGN(4);
+  _end = . ;
+
+  .intrstack : {
+    intrstack = . ;
+  } > intrstack
+
+  .bootstack : {
+    bootstack = . ;
+  } > bootstack
 }

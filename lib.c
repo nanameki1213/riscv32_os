@@ -1,6 +1,85 @@
 #include "lib.h"
 #include "uart.h"
 
+void printf(const char *fmt, ...) {
+  va_list vargs;
+  va_start(vargs, fmt);
+
+  while (*fmt) {
+    if (*fmt == '%') {
+      fmt++;
+      switch (*fmt) {
+        case '\0':
+          putc('%');
+          goto end;
+        case '%':
+          putc('%');
+          break;
+        case 's': {
+          const char *s = va_arg(vargs, const char *);
+          puts(s);
+          break;
+        }
+        case 'd': {
+          int value = va_arg(vargs, int);
+          if (value < 0) {
+            putc('-');
+            value = -value;
+          }
+
+          int divisor = 1;
+          while (value / divisor > 9)
+            divisor *= 10;
+
+          while (divisor > 0) {
+            putc('0' + value / divisor);
+            value %= divisor;
+            divisor /= 10;
+          }
+
+          break;
+        }
+        case 'x': {
+          int value = va_arg(vargs, int);
+          for (int i = 7; i >= 0; i--) {
+            int nibble = (value >> (i * 4)) & 0xf;
+            putc("0123456789abcdef"[nibble]);
+          }
+        }
+      }
+    } else {
+        putc(*fmt);
+    }
+
+    fmt++;
+  }
+
+end:
+  va_end(vargs);
+}
+
+int putxval(unsigned long value, int column)
+{
+  char buf[9];
+  char *p;
+
+  p = buf + sizeof(buf) - 1;
+  *(p--) = '\0';
+
+  if (!value && !column)
+    column++;
+
+  while (value || column) {
+    *(p--) = "0123456789abcdef"[value & 0xf];
+    value >>= 4;
+    if (column) column--;
+  }
+
+  puts(p + 1);
+
+  return 0;
+}
+
 int putc(unsigned char c)
 {
   // 改行文字の場合はCRLF(\r\n)にして送信

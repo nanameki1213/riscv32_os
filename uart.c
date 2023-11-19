@@ -24,11 +24,30 @@ unsigned char uart_rx()
   unsigned char c;
 
   while(!uart_is_recv_enable()) { // 文字が来るまで待つ
-    // uart_tx('1');
     ;
   }
-  // uart_tx('!');
   c = *rx;
 
   return c;
+}
+
+int uart_intr_is_recv_enable()
+{
+  volatile unsigned char *ier = UART_BASE_ADDR + NS16550_IER;
+
+  return (*ier & NS16550_IER_RX_INTR);
+}
+
+void uart_intr_recv_enable()
+{
+  volatile unsigned char *ier = UART_BASE_ADDR + NS16550_IER;
+
+  *ier |= NS16550_IER_RX_INTR;
+}
+
+void uart_intr_recv_disable()
+{
+  volatile unsigned char *ier = UART_BASE_ADDR + NS16550_IER;
+
+  *ier &= ~NS16550_IER_RX_INTR;
 }

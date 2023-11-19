@@ -3,6 +3,14 @@
 
 typedef unsigned int size_t;
 
+#define va_list __builtin_va_list
+#define va_start(v, ...) __builtin_va_start(v, 0)
+#define va_arg(v,l) __builtin_va_arg(v,l)
+#define va_end(v) __builtin_va_end(v)
+
+void printf(const char *fmt, ...);
+
+int putxval(unsigned long value, int column);
 int putc(unsigned char c);
 int puts(char *s);
 
