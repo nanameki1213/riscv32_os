@@ -1,30 +1,27 @@
-PREFIX = ~/riscv64_github
-ARCH = riscv64-unknown-elf
-BINDIR = $(PREFIX)/bin
+ARCH = riscv32-unknown-linux-gnu
 ADDNAME = $(ARCH)-
 
-AR			= $(BINDIR)/$(ADDNAME)ar
-AS			= $(BINDIR)/$(ADDNAME)as
-CC			= $(BINDIR)/$(ADDNAME)gcc
-LD			= $(BINDIR)/$(ADDNAME)ld
-OBJCOPY	= $(BINDIR)/$(ADDNAME)objcopy
-OBJDUMP	= $(BINDIR)/$(ADDNAME)objdump
-RANLIB 	= $(BINDIR)/$(ADDNAME)ranlib
-STRIP  	= $(BINDIR)/$(ADDNAME)strip
+AR			= $(ADDNAME)ar
+AS			= $(ADDNAME)as
+CC			= $(ADDNAME)gcc
+LD			= $(ADDNAME)ld
+OBJCOPY	= $(ADDNAME)objcopy
+OBJDUMP	= $(ADDNAME)objdump
+RANLIB 	= $(ADDNAME)ranlib
+STRIP  	= $(ADDNAME)strip
 
 OBJS = start.o main.o lib.o uart.o
 
 TARGET = testboot
 
-CFLAGS = -march=rv32if -mabi=ilp32f
-CFLAGS += -I.
+CFLAGS = -I.
 
-LFLAGS = -m elf32lriscv -b elf32-littleriscv --no-relax -T
+LFLAGS = -m elf32lriscv -b elf32-littleriscv -nostdlib --no-relax
 
 all : $(TARGET)
 
 $(TARGET) : $(OBJS)
-						$(LD) $(LFLAGS) test.ld $(OBJS) -o testboot.elf
+						$(LD) $(LFLAGS) -T test.ld $(OBJS) -o testboot.elf
 
 .c.o	:	$<
 				$(CC) -c $(CFLAGS) $<

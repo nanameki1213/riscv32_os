@@ -4,6 +4,9 @@
 
 int main(void)
 {
+  char *str = "hello, world\n";
+
+  printf("%d\n", 3);
   // char buf[32];
 
   // INTR_ENABLE;

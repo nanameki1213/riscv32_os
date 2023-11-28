@@ -2,7 +2,7 @@
 #include "uart.h"
 
 void printf(const char *fmt, ...) {
-  va_list vargs;
+    va_list vargs;
   va_start(vargs, fmt);
 
   while (*fmt) {
