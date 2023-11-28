@@ -34,6 +34,5 @@ int main(void)
   printf("erodata:      0x%x\n", &erodata);
   printf("intrstack:    0x%x\n", &intrstack);
   printf("bootstack:    0x%x\n", &bootstack);
-
   return 0;
 }
