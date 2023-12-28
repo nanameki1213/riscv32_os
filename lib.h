@@ -10,7 +10,6 @@ typedef unsigned int size_t;
 
 void printf(const char *fmt, ...);
 
-int putxval(unsigned long value, int column);
 int putc(unsigned char c);
 int puts(char *s);
 
@@ -25,5 +24,7 @@ int strncmp(const char *s1, const char *s2, size_t n);
 void *memcpy(void *dest, const void *src, size_t n);
 void *memset(void *dest, int val, size_t n);
 int memcmp(const void *buf1, const void *buf2, size_t n);
+
+int cpuid();
 
 #endif

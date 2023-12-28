@@ -2,7 +2,7 @@
 #include "uart.h"
 
 void printf(const char *fmt, ...) {
-    va_list vargs;
+  va_list vargs;
   va_start(vargs, fmt);
 
   while (*fmt) {
@@ -56,28 +56,6 @@ void printf(const char *fmt, ...) {
 
 end:
   va_end(vargs);
-}
-
-int putxval(unsigned long value, int column)
-{
-  char buf[9];
-  char *p;
-
-  p = buf + sizeof(buf) - 1;
-  *(p--) = '\0';
-
-  if (!value && !column)
-    column++;
-
-  while (value || column) {
-    *(p--) = "0123456789abcdef"[value & 0xf];
-    value >>= 4;
-    if (column) column--;
-  }
-
-  puts(p + 1);
-
-  return 0;
 }
 
 int putc(unsigned char c)
@@ -205,4 +183,11 @@ int memcmp(const void *buf1, const void *buf2, size_t n)
   }
 
   return 0;
+}
+
+int cpuid()
+{
+  int id;
+  asm volatile ("mv %0, tp" : "=r"(id));
+  return id;
 }

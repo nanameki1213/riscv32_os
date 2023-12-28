@@ -1,11 +1,7 @@
 #include "interrupt.h"
 
-int softvec_init()
-{
 
-}
-
-void interrupt(unsigned int sp)
+void interrupt(softvec_type_t type, unsigned int sp)
 {
-  
+  intr(type, sp);
 }

@@ -3,7 +3,7 @@
 .type _start, @function
 
 _start:
-  li sp, 0x800fffff
+  la sp, bootstack
   call main
 loop:
   j loop

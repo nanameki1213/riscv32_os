@@ -1,24 +1,51 @@
 #include "intr.h"
 
+.text
 .globl intr_serial
-.type intr_serial,@function
+.type intr_serial, @function
 
 intr_serial:
-  sd s0, 0*4(sp)
-  sd s1, 1*4(sp)
-  sd s2, 2*4(sp)
-  sd s3, 3*4(sp)
-  sd s4, 4*4(sp)
-  sd s5, 5*4(sp)
-  sd s6, 6*4(sp)
-  sd s7, 7*4(sp)
-  sd s8, 8*4(sp)
-  sd s9, 9*4(sp)
-  sd s10, 10*4(sp)
-  sd s11, 11*4(sp)
-  sd ra, 12*8(sp)
-  sd #_intrstack, sp
-  sd sp, (a0)
-  sd #SOFTVEC_TYPE_SERINTR, (a1)
+  sw ra, 0*8(sp)
+  sw a0, 1*8(sp)
+  sw a1, 2*8(sp)
+  sw a2, 3*8(sp)
+  sw a3, 4*8(sp)
+  sw a4, 5*8(sp)
+  sw a5, 6*8(sp)
+  sw a6, 7*8(sp)
+  sw a7, 8*8(sp)
+  sw t0, 9*8(sp)
+  sw t1, 10*8(sp)
+  sw t2, 11*8(sp)
+  sw t3, 12*8(sp)
+  sw t4, 13*8(sp)
+  sw t5, 14*8(sp)
+  sw t6, 15*8(sp)
+  sw s0, 16*8(sp)
+  sw sp, (a1) # スタックポインタを第二引数として渡す
+  la sp, intrstack # 割り込みスタックを利用する
+  sw a0, 0*8(sp) # 旧スタックポインタの値を割り込みスタックに保存する
+  li a0, SOFTVEC_TYPE_SERINTR
+  addi sp, sp, 8
   call interrupt
-  ld sp, (a0)
+  addi sp, sp, -8
+  lw t0, (sp)
+  mv sp, t0 # 旧スタックポインタの値を割り込みスタックから復旧する
+  lw ra, 0*8(sp)
+  lw a0, 1*8(sp)
+  lw a1, 2*8(sp)
+  lw a2, 3*8(sp)
+  lw a3, 4*8(sp)
+  lw a4, 5*8(sp)
+  lw a5, 6*8(sp)
+  lw a6, 7*8(sp)
+  lw a7, 8*8(sp)
+  lw t0, 9*8(sp)
+  lw t1, 10*8(sp)
+  lw t2, 11*8(sp)
+  lw t3, 12*8(sp)
+  lw t4, 13*8(sp)
+  lw t5, 14*8(sp)
+  lw t6, 15*8(sp)
+  lw s0, 16*8(sp)
+  mret

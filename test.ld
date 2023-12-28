@@ -15,7 +15,7 @@ SECTIONS
     *(.text)
     etext = . ;
   } > ram
-
+  
   .rodata : {
     rodata_start = . ;
     *(.strings)
@@ -28,13 +28,14 @@ SECTIONS
     *(.data)
   } > ram
 
+
   .bss : {
     *(.bss)
     *(COMMON)
   } > ram
 
   . = ALIGN(4);
-  _end = . ;
+  end = . ;
 
   .intrstack : {
     intrstack = . ;
