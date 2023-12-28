@@ -42,6 +42,7 @@ int main(void)
   
   // printf("vectors addr: %x\n", &vectors);
   SET_VECTOR_ADDRESS(&vectors);
+  
 
   // extern char text_start;
   // extern char etext;

@@ -20,4 +20,16 @@ static inline void w_sie(int x)
   asm volatile("csrw sip, %0" : "=r"(x));
 }
 
+static inline int r_mie()
+{
+  int x;
+  asm volatile("csrr %0, mip" : "=r"(x));
+  return x;
+}
+
+static inline void w_mie(int x)
+{
+  asm volatile("csrw mip, %0" : "=r"(x));
+}
+
 #endif
