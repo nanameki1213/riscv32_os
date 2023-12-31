@@ -5,6 +5,7 @@
 #include "defines.h"
 #include "riscv.h"
 
+extern int m_vectors, s_vectors;
 extern int intr_serial;
 
 void intr(softvec_type_t type, unsigned int sp)
@@ -36,7 +37,7 @@ int main(void)
   intr_disable();
 
   int id = get_mhartid();
-  printf("target id = %d\n", id);
+  // printf("target id = %d\n", id);
 
   // PLICの初期設定
 
@@ -51,14 +52,14 @@ int main(void)
   int column = UART0_IRQ % 32;
   int row = UART0_IRQ / 32;
   *(uint32*)(PLIC_ENABLE(id) + row) |= (1U<<column);
-  printf("column = %d\nrow = %d\n", column, row);
-  printf("plic enable addr = 0x%x\n", PLIC_ENABLE(id) + row);
+  // printf("column = %d\nrow = %d\n", column, row);
+  // printf("plic enable addr = 0x%x\n", PLIC_ENABLE(id) + row);
 
   column = VIRTIO_IRQ % 32;
   row = VIRTIO_IRQ / 32;
   *(uint32*)(PLIC_ENABLE(id) + row) |= (1U<<column);
 
-  set_mideleg(get_mideleg() | xIE_SEIE | xIE_STIE | xIE_SSIE); // Mモードから割り込みを移譲
+  set_mideleg(get_mideleg() | xIE_SEIE | xIE_STIE | xIE_SSIE | MIE_MEIE | MIE_MTIE | MIE_MSIE); // Mモードから割り込みを移譲
   set_mtvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
   set_stvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
 

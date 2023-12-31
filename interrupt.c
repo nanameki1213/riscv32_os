@@ -1,5 +1,7 @@
 #include "interrupt.h"
 #include "riscv.h"
+#include "memlayout.h"
+#include "defines.h"
 
 // S，Mモード両方の割込みを有効にする
 void intr_enable()
@@ -23,5 +25,16 @@ void intr_disable()
 
 void interrupt(softvec_type_t type, unsigned int sp)
 {
-  intr(type, sp);
+  int id = get_mhartid();
+
+  // PLICに割込みclaimを送信
+  int irq = *(uint32*)PILC_CLAIM(id);
+
+  if(irq == UART0_IRQ) {
+    intr(type, sp);
+  }
+
+  // PLICにcomplete通知を行う
+  *(uint32*)PILC_CLAIM(id) = irq;
+
 }
