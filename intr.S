@@ -3,7 +3,7 @@
 .text
 .globl intr_serial
 .type intr_serial, @function
-
+.balign 256
 intr_serial:
   sw ra, 0*8(sp)
   sw a0, 1*8(sp)

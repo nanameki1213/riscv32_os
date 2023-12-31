@@ -10,7 +10,7 @@ OBJDUMP	= $(ADDNAME)objdump
 RANLIB 	= $(ADDNAME)ranlib
 STRIP  	= $(ADDNAME)strip
 
-OBJS = start.o main.o lib.o uart.o vector.o intr_test.o interrupt.o plic.o
+OBJS = start.o intr.o main.o lib.o uart.o vector.o interrupt.o plic.o
 
 TARGET = testboot
 

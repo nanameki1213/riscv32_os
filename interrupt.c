@@ -10,6 +10,8 @@ void intr_enable()
 
   // set_sie(get_sie() | xIE_SEIE | xIE_STIE | xIE_SSIE);
   set_mie(get_mie() | MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE);
+
+  set_mstatus(get_mstatus() | MSTATUS_SIE | MSTATUS_MIE);
 }
 
 // S，Mモード両方の割込みを無効にする

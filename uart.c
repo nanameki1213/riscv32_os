@@ -42,7 +42,7 @@ void uart_intr_recv_enable()
 {
   volatile unsigned char *ier = UART_BASE_ADDR + NS16550_IER;
 
-  *ier |= NS16550_IER_RX_INTR;
+  *ier |= NS16550_IER_RX_INTR | NS16550_IER_TX_INTR;
 }
 
 void uart_intr_recv_disable()
