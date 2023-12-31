@@ -5,7 +5,7 @@
 #include "defines.h"
 #include "riscv.h"
 
-extern int vectors;
+extern int m_vectors, s_vectors;
 
 void intr(softvec_type_t type, unsigned int sp)
 {
@@ -32,38 +32,39 @@ void intr(softvec_type_t type, unsigned int sp)
 
 int main(void)
 {
+  // 初期設定中は外部割り込みを切る
+  intr_disable();
 
-  int id = r_mhartid();
-  asm volatile("mv tp, %0" : "=r"(id));
-  
+  int id = get_mhartid();
+
   // PLICの初期設定
-  uint32 *enable_addr = PLIC_ENABLE(id);
-  *enable_addr |= (1 << UART_IRQ);
-  
-  // printf("vectors addr: %x\n", &vectors);
-  SET_VECTOR_ADDRESS(&vectors);
-  
+  // UARTの割り込みを許可
+  int column = UART0_IRQ % 32;
+  int row = UART0_IRQ / 32;
+  *(uint32*)(PLIC_ENABLE(id) + 0) |= (1U<<column);
+  set_mideleg(get_mideleg() | xIE_xEIE); // Mモードから割り込みを移譲
+  set_mtvec((uint32)(&m_vectors) | MODE_VECTOR); // 割り込みベクタを登録
+  set_stvec((uint32)(&s_vectors) | MODE_VECTOR); // 割り込みベクタを登録
 
-  // extern char text_start;
-  // extern char etext;
-  // extern char rodata_start;
-  // extern char erodata;
-  // extern char intrstack;
-  // extern char bootstack;
+  extern char text_start;
+  extern char etext;
+  extern char rodata_start;
+  extern char erodata;
+  extern char intrstack;
+  extern char bootstack;
 
-  // printf("text_start:   0x%x\n", &text_start);
-  // printf("etext:        0x%x\n", &etext);
-  // printf("rodata_start: 0x%x\n", &rodata_start);
-  // printf("erodata:      0x%x\n", &erodata);
-  // printf("intrstack:    0x%x\n", &intrstack);
-  // printf("bootstack:    0x%x\n", &bootstack);
+  printf("text_start:   0x%x\n", &text_start);
+  printf("etext:        0x%x\n", &etext);
+  printf("rodata_start: 0x%x\n", &rodata_start);
+  printf("erodata:      0x%x\n", &erodata);
+  printf("intrstack:    0x%x\n", &intrstack);
+  printf("bootstack:    0x%x\n", &bootstack);
 
-  INTR_ENABLE;
-  asm volatile ("csrsi 0x304, 0x001e");
-  // puts("$ ");
-  // while(1) {
-  //   ;
-  // }
+  intr_enable();
+  puts("$ ");
+  while(1) {
+    ;
+  }
 
   return 0;
 }
