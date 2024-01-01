@@ -19,9 +19,9 @@
 #define MIP_MTIP (1<<7) // タイマ割り込みペンディング
 #define MIP_MSIP (1<<3) // ソフトウェア割込みペンディング
 
-#define xIE_SEIP (1<<9) // 外部割込みペンディング(Sモード)
-#define xIE_STIP (1<<5) // タイマ割込みペンディング(Sモード)
-#define xIE_SSIP (1<<1) // ソフトウェア割込みペンディング(Sモード)
+#define xIP_SEIP (1<<9) // 外部割込みペンディング(Sモード)
+#define xIP_STIP (1<<5) // タイマ割込みペンディング(Sモード)
+#define xIP_SSIP (1<<1) // ソフトウェア割込みペンディング(Sモード)
 
 #define MODE_VECTOR 1U
 #define MODE_DIRECT ~(3U)
@@ -62,6 +62,18 @@ static inline int get_mstatus()
 static inline void set_mstatus(int x)
 {
   asm volatile("csrw mstatus, %0" : "=r"(x));
+}
+
+static inline int get_mepc()
+{
+  int x;
+  asm volatile("csrr %0, mepc" : "=r"(x));
+  return x;
+}
+
+static inline void set_mepc(int x)
+{
+  asm volatile("csrw mepc, %0" : "=r"(x));
 }
 
 static inline int get_mtvec()
@@ -112,7 +124,7 @@ static inline void set_mie(int x)
   asm volatile("csrw mie, %0" : "=r"(x));
 }
 
-static inline void get_sip()
+static inline int get_sip()
 {
   int x;
   asm volatile("csrr %0, sip" : "=r"(x));
@@ -124,7 +136,7 @@ static inline void set_sip(int x)
   asm volatile("csrw sip, %0" : "=r"(x));
 }
 
-static inline void get_mip()
+static inline int get_mip()
 {
   int x;
   asm volatile("csrr %0, mip" : "=r"(x));
