@@ -52,6 +52,18 @@ static inline void set_mideleg(int x)
   asm volatile("csrw mideleg, %0" : "=r"(x));
 }
 
+static inline int get_medeleg()
+{
+  int x;
+  asm volatile("csrr %0, medeleg" : "=r"(x));
+  return x;
+}
+
+static inline void set_medeleg(int x)
+{
+  asm volatile("csrw medeleg, %0" : "=r"(x));
+}
+
 static inline int get_mstatus()
 {
   int x;

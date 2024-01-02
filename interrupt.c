@@ -55,5 +55,6 @@ void interrupt(softvec_type_t type, unsigned int sp)
   // int pc = get_mepc();
   // printf("ret pc = 0x%x\n", pc);
 
+  // 割込み有効化
   intr_enable();
 }

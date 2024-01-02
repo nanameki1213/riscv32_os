@@ -5,6 +5,7 @@
 .type intr_serial, @function
 .balign 256
 intr_serial:
+  addi sp, sp, -8*17
   sw ra, 0*8(sp)
   sw a0, 1*8(sp)
   sw a1, 2*8(sp)
@@ -22,13 +23,11 @@ intr_serial:
   sw t5, 14*8(sp)
   sw t6, 15*8(sp)
   sw s0, 16*8(sp)
-  sw sp, (a1) # スタックポインタを第二引数として渡す
+  mv a1, sp # スタックポインタを第二引数として渡す
   la sp, intrstack # 割り込みスタックを利用する
   sw a0, 0*8(sp) # 旧スタックポインタの値を割り込みスタックに保存する
   li a0, SOFTVEC_TYPE_SERINTR
-  addi sp, sp, 8
   call interrupt
-  addi sp, sp, -8
   lw t0, (sp)
   mv sp, t0 # 旧スタックポインタの値を割り込みスタックから復旧する
   lw ra, 0*8(sp)
@@ -48,4 +47,5 @@ intr_serial:
   lw t5, 14*8(sp)
   lw t6, 15*8(sp)
   lw s0, 16*8(sp)
+  addi sp, sp, 8*17
   mret
