@@ -4,6 +4,7 @@
 #include "memlayout.h"
 #include "defines.h"
 #include "riscv.h"
+#include "timer.h"
 
 extern int m_vectors, s_vectors;
 extern int intr_serial;
@@ -34,6 +35,7 @@ void uart(intr_type_t type, unsigned int sp)
 void timer(intr_type_t type, unsigned int sp)
 {
   printf("time up!\n");
+  timer_intr_disable();
 }
 
 int main(void)
@@ -85,10 +87,12 @@ int main(void)
   printf("bootstack:    0x%x\n", &bootstack);
 
   // 割込み有効化
+  external_intr_enable();
   intr_enable();
   uart_intr_recv_enable();
 
   puts("$ ");
+  start_timer(1000);
   while(1) {
     ;
   }

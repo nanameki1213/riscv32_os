@@ -1,7 +1,7 @@
 #include "timer.h"
 #include "defines.h"
 
-static void start_timer(int s)
+void start_timer(int ms)
 {
   // タイマ割込み有効化
   timer_intr_enable();
@@ -10,5 +10,5 @@ static void start_timer(int s)
   uint64 *mtime = MTIME;
 
   *mtime = 0;
-  *mtimecmp = s * 1000;
+  *mtimecmp = ms * 10000;
 }

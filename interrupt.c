@@ -54,7 +54,7 @@ void intr_enable()
   set_mip(get_mip() & ~(MIP_MEIP | MIP_MTIP | MIP_MSIP | xIP_SEIP | xIP_STIP | xIP_SSIP));
 
   // set_sie(get_sie() | xIE_SEIE | xIE_STIE | xIE_SSIE);
-  set_mie(get_mie() | MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE);
+  // set_mie(get_mie() | MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE);
 
   set_mstatus(get_mstatus() | MSTATUS_SIE | MSTATUS_MIE);
 }
@@ -63,7 +63,7 @@ void intr_enable()
 void intr_disable()
 {
   // set_sie(get_sie() & ~(xIE_SEIE | xIE_STIE | xIE_SSIE));
-  set_mie(get_mie() & ~(uint32)(MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE));
+  // set_mie(get_mie() & ~(uint32)(MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE));
 
   set_mstatus(get_mstatus() & ~(uint32)(MSTATUS_SIE | MSTATUS_MIE));
 }
@@ -94,10 +94,7 @@ void interrupt(intr_type_t type, unsigned int sp)
     }
     // PLICにcomplete通知を行う
     *(uint32*)PILC_CLAIM(id) = irq;
-    return;
-  }
-
-  if(type == INTR_TYPE_TIMINTR) {
+  } else if(type == INTR_TYPE_TIMINTR) {
     timer(type, sp);
   }
 
