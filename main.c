@@ -8,7 +8,7 @@
 extern int m_vectors, s_vectors;
 extern int intr_serial;
 
-void intr(softvec_type_t type, unsigned int sp)
+void uart(intr_type_t type, unsigned int sp)
 {
   int c;
   static char buf[64];
@@ -29,6 +29,11 @@ void intr(softvec_type_t type, unsigned int sp)
     puts("$ ");
     len = 0;
   }
+}
+
+void timer(intr_type_t type, unsigned int sp)
+{
+  printf("time up!\n");
 }
 
 int main(void)
@@ -60,8 +65,10 @@ int main(void)
   *(uint32*)(PLIC_ENABLE(id) + row) |= (1U<<column);
 
   set_mideleg(get_mideleg() | xIE_SEIE | xIE_STIE | xIE_SSIE | MIE_MEIE | MIE_MTIE | MIE_MSIE); // Mモードから割り込みを移譲
-  set_mtvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
-  set_stvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
+  // set_mtvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
+  // set_stvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
+  set_mtvec((uint32)(&m_vectors) | MODE_VECTOR);
+  set_stvec((uint32)(&s_vectors) | MODE_VECTOR);
 
   extern char text_start;
   extern char etext;

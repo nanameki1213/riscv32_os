@@ -10,19 +10,21 @@ m_vectors:
   .balign 4
   j m_undefined_handler
   .balign 4
-  j m_undefined_handler
+  j intr_timer
+  .balign 4
+  j intr_timer
   .balign 4
   j m_undefined_handler
   .balign 4
-  j m_undefined_handler
+  j intr_timer
+  .balign 4
+  j intr_external
+  .balign 4
+  j intr_external
   .balign 4
   j m_undefined_handler
   .balign 4
-  j m_undefined_handler
-  .balign 4
-  j m_undefined_handler
-  .balign 4
-  j intr_serial
+  j intr_external
 
 m_undefined_handler:
   mret
@@ -39,19 +41,21 @@ s_vectors:
   .balign 4
   j s_undefined_handler
   .balign 4
-  j s_undefined_handler
+  j intr_timer
+  .balign 4
+  j intr_timer
   .balign 4
   j s_undefined_handler
   .balign 4
-  j s_undefined_handler
+  j intr_timer
+  .balign 4
+  j intr_external
+  .balign 4
+  j intr_external
   .balign 4
   j s_undefined_handler
   .balign 4
-  j s_undefined_handler
-  .balign 4
-  j s_undefined_handler
-  .balign 4
-  j intr_serial
+  j intr_external
 
 s_undefined_handler:
   sret
