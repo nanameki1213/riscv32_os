@@ -85,6 +85,7 @@ unsigned char getc()
 {
   unsigned char c = uart_rx();
   c = (c == '\r') ? '\n' : c;
+  c = (c == 0x7f) ? '\b' : c;
   putc(c); // エコーバック
 
   return c;

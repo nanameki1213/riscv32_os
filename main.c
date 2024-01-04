@@ -13,23 +13,59 @@ void uart(intr_type_t type, unsigned int sp)
 {
   int c;
   static char buf[64];
-  static int len;
+  static int len = 0;
 
   c = getc();
 
-  if(c != '\n') {
-    buf[len++] = c;
-  } else {
-    buf[len++] = '\0';
-    if(!strncmp(buf, "echo", 4)) {
-      puts(buf + 4);
-      puts("\n");
-    } else {
-      puts("unknown.\n");
-    }
-    puts("$ ");
-    len = 0;
+  switch(c) {
+    case '\n':
+      buf[len++] = '\0';
+      if(!strncmp(buf, "echo", 4)) {
+        puts(buf + 4);
+        puts("\n");
+      } else if(!strncmp(buf, "exit", 4)) { 
+
+      } else {
+        puts("unknown.\n");
+      }
+      puts("$ ");
+      len = 0;
+      break;
+    case '\b':
+      if(len == 0) {
+        putc(' ');
+        return;
+      }
+      len--;
+      break;
+    default:
+      buf[len++] = c;
   }
+
+  // if(c != '\n') {
+  //   if(c != '\b') {
+  //     buf[len++] = c;
+  //     return;
+  //   }
+  //   printf("backspace");
+  //   if(len == 0) {
+  //     putc(' ');
+  //     return;
+  //   }
+  //   len--;
+  // } else {
+  //   buf[len++] = '\0';
+  //   if(!strncmp(buf, "echo", 4)) {
+  //     puts(buf + 4);
+  //     puts("\n");
+  //   } else if(!strncmp(buf, "exit", 4)) { 
+
+  //   } else {
+  //     puts("unknown.\n");
+  //   }
+  //   puts("$ ");
+  //   len = 0;
+  // }
 }
 
 void timer(intr_type_t type, unsigned int sp)
@@ -92,7 +128,7 @@ int main(void)
   uart_intr_recv_enable();
 
   puts("$ ");
-  start_timer(1000);
+  // start_timer(1000);
   while(1) {
     ;
   }
