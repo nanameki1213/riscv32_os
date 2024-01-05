@@ -39,7 +39,6 @@ static inline int get_mhartid()
   return x;
 }
 
-
 static inline int get_mideleg()
 {
   int x;
@@ -62,6 +61,18 @@ static inline int get_medeleg()
 static inline void set_medeleg(int x)
 {
   asm volatile("csrw medeleg, %0" : "=r"(x));
+}
+
+static inline int get_satp()
+{
+  int x;
+  asm volatile("csrr %0, satp" : "=r"(x));
+  return x;
+}
+
+static inline void set_satp(int x)
+{
+  asm volatile("csrw satp, %0" : "=r"(x));
 }
 
 static inline int get_mstatus()

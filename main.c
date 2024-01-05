@@ -41,31 +41,6 @@ void uart(intr_type_t type, unsigned int sp)
     default:
       buf[len++] = c;
   }
-
-  // if(c != '\n') {
-  //   if(c != '\b') {
-  //     buf[len++] = c;
-  //     return;
-  //   }
-  //   printf("backspace");
-  //   if(len == 0) {
-  //     putc(' ');
-  //     return;
-  //   }
-  //   len--;
-  // } else {
-  //   buf[len++] = '\0';
-  //   if(!strncmp(buf, "echo", 4)) {
-  //     puts(buf + 4);
-  //     puts("\n");
-  //   } else if(!strncmp(buf, "exit", 4)) { 
-
-  //   } else {
-  //     puts("unknown.\n");
-  //   }
-  //   puts("$ ");
-  //   len = 0;
-  // }
 }
 
 void timer(intr_type_t type, unsigned int sp)
