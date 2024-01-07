@@ -29,7 +29,7 @@
 #define MODE_DIRECT ~(3U)
 
 #define SATP_SV32 (1<<31)
-#define SATP_PPN(root) (root & ~0x3fffff)
+#define SATP_PPN(root) (root & 0x3fffff)
 
 enum {
   UART0_IRQ = 10,

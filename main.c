@@ -54,6 +54,8 @@ int main(void)
   // 初期設定中は外部割り込みを無効にする
   intr_disable();
 
+  printf("kernel is booting\n");
+
   int id = get_mhartid();
   // printf("target id = %d\n", id);
 
@@ -106,9 +108,7 @@ int main(void)
   uart_intr_recv_enable();
 
   init_memstat();
-
-  uint32 *mem = alloc();
-  printf("0x%x\n", mem);
+  init_pte();
 
   puts("$ ");
   // start_timer(1000);

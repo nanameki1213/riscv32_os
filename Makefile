@@ -11,7 +11,7 @@ RANLIB 	= $(ADDNAME)ranlib
 STRIP  	= $(ADDNAME)strip
 
 OBJS = start.o intr.o main.o lib.o uart.o vector.o interrupt.o plic.o timer.o
-OBJS += pte.o memcho.o memory.o
+OBJS += pte.o page.o memcho.o memory.o
 
 TARGET = testboot
 

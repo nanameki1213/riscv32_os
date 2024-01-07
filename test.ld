@@ -55,9 +55,4 @@ SECTIONS
   .freearea : {
     freearea = .;
   } > freearea
-
-  .pte : {
-    pte_addr = . ;
-    pte.o(.data)
-  } > ram
 }

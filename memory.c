@@ -21,7 +21,7 @@ void init_memstat()
   printf("Kernel is using page until %d\n", i);
 }
 
-void *alloc()
+void *alloc_page()
 {
   int i;
   for(i = 0; i < RAM_PAGE_NUM; i++) {
@@ -32,8 +32,16 @@ void *alloc()
   }
   if(i == RAM_PAGE_NUM) { // メモリが足りない
     printf("メモリが足りません\n");
+    return NULL;
   }
   memcho[i] = MEMSTAT_OS;
+  printf("alloc page: %d\n", i);
 
   return (void*)(i * 0x1000 + RAM_BASE_ADDR);
+}
+
+void free_page(void *mem)
+{
+  int page = ((uint32)mem - RAM_BASE_ADDR) / 0x1000;
+  memcho[page] = MEMSTAT_AVA;
 }
