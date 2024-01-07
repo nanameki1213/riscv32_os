@@ -1,8 +1,10 @@
 #ifndef PAGE_H
 #define PAGE_H
 
+
 typedef unsigned int pte_t;
 
+#define PPN(ppn) (ppn<<10)
 #define PPN_1(ppn1) (ppn1<<20)
 #define PPN_2(ppn2) (ppn2<<10)
 

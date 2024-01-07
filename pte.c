@@ -1,36 +1,5 @@
 #include "page.h"
+#include "riscv.h"
 
-pte_t ppn2[] = {
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-  (pte_t)(PTE_V | PTE_X | PTE_W | PTE_R),
-};
+// PPN1のページ番号は，アドレス/0x400000
+pte_t ppn1[1024] = {0};

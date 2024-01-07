@@ -4,6 +4,8 @@
 #define INTR_SOURCES_NUM 96
 #define INTR_PRIORITY_MAX 7
 
+#define RAM_BASE_ADDR 0x80000000
+
 #define MSTATUS_SIE (1<<1)
 #define MSTATUS_MIE (1<<3)
 
@@ -25,6 +27,9 @@
 
 #define MODE_VECTOR 1U
 #define MODE_DIRECT ~(3U)
+
+#define SATP_SV32 (1<<31)
+#define SATP_PPN(root) (root & ~0x3fffff)
 
 enum {
   UART0_IRQ = 10,

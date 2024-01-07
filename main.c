@@ -83,24 +83,32 @@ int main(void)
   set_mtvec((uint32)(&m_vectors) | MODE_VECTOR);
   set_stvec((uint32)(&s_vectors) | MODE_VECTOR);
 
-  extern char text_start;
-  extern char etext;
-  extern char rodata_start;
-  extern char erodata;
-  extern char intrstack;
-  extern char bootstack;
+  // extern char text_start;
+  // extern char etext;
+  // extern char rodata_start;
+  // extern char erodata;
+  // extern char intrstack;
+  // extern char bootstack;
 
-  printf("text_start:   0x%x\n", &text_start);
-  printf("etext:        0x%x\n", &etext);
-  printf("rodata_start: 0x%x\n", &rodata_start);
-  printf("erodata:      0x%x\n", &erodata);
-  printf("intrstack:    0x%x\n", &intrstack);
-  printf("bootstack:    0x%x\n", &bootstack);
+  // printf("text_start:   0x%x\n", &text_start);
+  // printf("etext:        0x%x\n", &etext);
+  // printf("rodata_start: 0x%x\n", &rodata_start);
+  // printf("erodata:      0x%x\n", &erodata);
+  // printf("intrstack:    0x%x\n", &intrstack);
+  // printf("bootstack:    0x%x\n", &bootstack);
+
+  extern char freearea;
+  printf("freearea: 0x%x\n", &freearea);
 
   // 割込み有効化
   external_intr_enable();
   intr_enable();
   uart_intr_recv_enable();
+
+  init_memstat();
+
+  uint32 *mem = alloc();
+  printf("0x%x\n", mem);
 
   puts("$ ");
   // start_timer(1000);
