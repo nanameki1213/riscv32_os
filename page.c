@@ -5,10 +5,16 @@
 
 extern char kernel_base, kernel_end;
 
-void va_to_2level(uint32 *src_addr, va2_t *va)
+void va_to_array(uint32 *src_addr, va2_t *va)
 {
-  va[0] = ((size_t)src_addr & 0x3fffff) >> 12;
-  va[1] = (size_t)src_addr>>22;
+  va[0] = ((size_t)src_addr & 0xfff);
+  va[1] = ((size_t)src_addr & 0x3fffff) >> 12;
+  va[2] = (size_t)src_addr>>22;
+}
+
+uint32 *array_to_va(va2_t *va)
+{
+  return (uint32*)(va[2]<<22 | va[1]<<12 | va[0]);
 }
 
 void set_kernel_page()
@@ -32,6 +38,11 @@ void page_enable()
 void page_disable()
 {
   set_satp(get_satp() & ~SATP_SV32);
+}
+
+void identity_map(uint32 *addr, size_t page_num)
+{
+  
 }
 
 pte_t *set_new_map(pte_t entry)
@@ -60,7 +71,7 @@ size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
 
     pte[entry_index] |= PTE_V;
 
-    if(level == 0) {
+    if(level == 1) {
       page_num--;
       pte[entry_index] |= (PTE_X | PTE_W | PTE_R);
     } else {
@@ -84,13 +95,13 @@ size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
 
 void setup_pages(uint32 *addr, size_t page_num)
 {
-  va2_t va[2];
-  va_to_2level(addr, va);
+  va2_t va[3];
+  va_to_array(addr, va);
 
   uint32 *pte = alloc_page();
   set_satp(SATP_PPN((uint32)pte / 0x1000));
 
-  setup_page(pte, PAGE_LEVEL - 1, addr, page_num);
+  setup_page(pte, PAGE_LEVEL, addr, page_num);
 }
 
 void clean_page()
