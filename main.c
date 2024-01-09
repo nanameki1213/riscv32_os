@@ -108,7 +108,8 @@ int main(void)
   uart_intr_recv_enable();
 
   init_memstat();
-  init_pte();
+  // set_kernel_page();
+  page_enable();
 
   puts("$ ");
   // start_timer(1000);

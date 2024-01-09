@@ -8,6 +8,7 @@ typedef unsigned int pte_t;
 typedef uint16 va2_t;
 
 #define PAGE_LEVEL 2
+#define PAGE_SIZE 4
 
 #define PPN(ppn) ((uint32)(ppn)<<10)
 #define PPN_1(ppn1) ((uint32)(ppn1)<<20)

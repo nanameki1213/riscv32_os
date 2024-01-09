@@ -12,18 +12,20 @@ MEMORY
 
 SECTIONS
 {
+  . = 0x80000000;
+  kernel_base = .;
   .text : {
-    text_start = . ;
+    text_start = .;
     *(.text)
     etext = . ;
   } > ram
   
   .rodata : {
-    rodata_start = . ;
+    rodata_start = .;
     *(.strings)
     *(.rodata)
     *(.rodata.*)
-    erodata = . ;
+    erodata = .;
   } > ram
 
   .data : {
@@ -36,21 +38,22 @@ SECTIONS
   } > ram
 
   . = ALIGN(4);
-  end = . ;
+  end = .;
 
   .intrstack : {
-    intrstack = . ;
+    intrstack = .;
   } > intrstack
 
   .bootstack : {
-    bootstack = . ;
+    bootstack = .;
   } > bootstack
 
   .memcho : {
-    memcho_start = . ;
+    memcho_start = .;
     memcho.o(.data)
   } > memcho
 
+  kernel_end = .;
 
   .freearea : {
     freearea = .;

@@ -3,21 +3,35 @@
 #include "defines.h"
 #include "lib.h"
 
+extern char kernel_base, kernel_end;
+
 void va_to_2level(uint32 *src_addr, va2_t *va)
 {
   va[0] = ((size_t)src_addr & 0x3fffff) >> 12;
   va[1] = (size_t)src_addr>>22;
 }
 
-void init_pte()
+void set_kernel_page()
 {
-  va2_t va[2] = {0};
-  va_to_2level(0x80200000, va);
+  uint32 *kernel_size = (&kernel_end - &kernel_base) / 1024;
+  int devide_page_size = (uint32)kernel_size / PAGE_SIZE;
 
-  uint32 *pte = alloc_page();
-  set_satp(SATP_SV32 | SATP_PPN((uint32)(pte) / 0x1000));
+  int kernel_page_size = ((uint32)kernel_size % PAGE_SIZE == 0) ? devide_page_size : devide_page_size + 1;
 
-  setup_pages(va, 4); // 16K割り当ててみる．
+  // printf("base: %x\n", &kernel_base);
+  // printf("end: %x\n", &kernel_end);
+  // printf("kernel size: %x\n", kernel_page_size);
+  setup_pages(&kernel_base, kernel_page_size);
+}
+
+void page_enable()
+{
+  set_satp(get_satp() | SATP_SV32);
+}
+
+void page_disable()
+{
+  set_satp(get_satp() & ~SATP_SV32);
 }
 
 pte_t *set_new_map(pte_t entry)
@@ -68,8 +82,23 @@ size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
   return page_num;
 }
 
-void setup_pages(va2_t *addr, size_t page_num)
+void setup_pages(uint32 *addr, size_t page_num)
 {
-  uint32 *pte = SATP_PPN(get_satp()) * 0x1000;
+  va2_t va[2];
+  va_to_2level(addr, va);
+
+  uint32 *pte = alloc_page();
+  set_satp(SATP_PPN((uint32)pte / 0x1000));
+
   setup_page(pte, PAGE_LEVEL - 1, addr, page_num);
+}
+
+void clean_page()
+{
+
+}
+
+void clean_pages(va2_t *addr)
+{
+
 }
