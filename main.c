@@ -111,12 +111,6 @@ int main(void)
   // set_kernel_page();
   page_enable();
 
-  uint32 *try_addr = 0x12345678;
-  uint16 va[3];
-  va_to_array(try_addr, va);
-  try_addr = array_to_va(va);
-  printf("tryaddr: %x\n", try_addr);
-
   puts("$ ");
   // start_timer(1000);
   while(1) {

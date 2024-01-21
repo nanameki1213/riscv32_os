@@ -19,7 +19,7 @@ uint32 *array_to_va(va2_t *va)
 
 void set_kernel_page()
 {
-  uint32 *kernel_size = (&kernel_end - &kernel_base) / 1024;
+  uint32 *kernel_size = (&kernel_end - &kernel_base);
   int devide_page_size = (uint32)kernel_size / PAGE_SIZE;
 
   int kernel_page_size = ((uint32)kernel_size % PAGE_SIZE == 0) ? devide_page_size : devide_page_size + 1;
@@ -40,9 +40,12 @@ void page_disable()
   set_satp(get_satp() & ~SATP_SV32);
 }
 
-void identity_map(uint32 *addr, size_t page_num)
+void identity_map(pte_t last_entry, uint32 *addr)
 {
+  uint32 *ram_page = ((uint32)addr - RAM_BASE_ADDR) / PAGE_SIZE;
+
   
+
 }
 
 pte_t *set_new_map(pte_t entry)
@@ -51,15 +54,17 @@ pte_t *set_new_map(pte_t entry)
     return (pte_t*)(entry>>10);
   }
 
-  uint32 *page = alloc_page();
-  if(page == NULL) {
+  uint32 *top_addr = alloc_page();
+  if(top_addr == NULL) {
     return NULL;
   }
 
-  entry |= PPN(page);
-  entry |= PTE_G;
+  int page = (uint32)top_addr / PAGE_SIZE;
 
-  return (pte_t*)page;
+  entry |= PPN(page);
+  entry |= PTE_V;
+
+  return (pte_t*)top_addr;
 }
 
 size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
