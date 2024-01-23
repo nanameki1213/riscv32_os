@@ -8,4 +8,6 @@
 #define PLIC_THRESHOLD(hart) (PLIC_BASE + 0x200000 + (hart)*0x1000)
 #define PILC_CLAIM(hart) (PLIC_BASE + 0x200004 + (hart)*0x1000)
 
+#define VIRT_MMIO 0x10001000
+
 #endif
