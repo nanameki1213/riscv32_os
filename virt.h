@@ -2,8 +2,10 @@
 #define VIRT_H
 
 #define VIRT_MMIO_NUM 8
+#define VIRTQ_ENTRY_NUM 128
+#define VIRT_BLK_DEVICEID 2
 
-#define VIRT_MMIO_MASIC 0x00
+#define VIRT_MMIO_MAGIC 0x00
 #define VIRT_MMIO_VERSION 0x04
 #define VIRT_MMIO_DEVICEID 0x08
 #define VIRT_MMIO_VENDERID 0x0c
@@ -34,14 +36,51 @@
 #define VIRT_MMIO_STAT_DEVICE_NEEDS_RESET (1<<4)
 #define VIRT_MMIO_STAT_FAILED (1<<5)
 
+struct VRingDesc {
+  uint64 addr;
+  uint32 len;
+  uint16 flags;
+  uint16 next;
+};
+
+struct VRingAvail {
+  uint16 flags;
+  uint16 idx;
+  uint16 ring[VIRTQ_ENTRY_NUM];
+};
+
+struct VRingUsedElem {
+  uint32 id;
+  uint32 len;
+};
+
+struct VRingUsed {
+  uint16 flags;
+  uint16 idx;
+  struct VRingUsedElem ring[VIRTQ_ENTRY_NUM];
+};
+
+struct VRing {
+  uint32 num;
+  uint32 num_default;
+  uint32 align;
+  struct VRingDesc desc;
+  struct VRingAvail avail;
+  struct VRingUsed used;
+};
+
+struct VirtQueue {
+  struct VRing vring;
+};
+
 static inline uint32 get_virt_mmio(uint32 *base, int offset)
 {
-  return *(base + offset);
+  return *(uint32*)((uint32)base + offset);
 }
 
 static inline void set_virt_mmio(uint32 *base, int offset, uint32 value)
 {
-  *(base + offset) = value;
+  *(uint32*)((uint32)base + offset) = value;
 }
 
 #endif

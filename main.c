@@ -108,7 +108,7 @@ int main(void)
   uart_intr_recv_enable();
 
   // ディスクの初期化
-  init_virt_disk(VIRT_MMIO);
+  init_disk(VIRT_MMIO);
 
   init_memstat();
   // set_kernel_page();
