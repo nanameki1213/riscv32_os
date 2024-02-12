@@ -1,6 +1,8 @@
 #ifndef VIRT_H
 #define VIRT_H
 
+#include "defines.h"
+
 #define VIRT_MMIO_NUM 8
 #define VIRTQ_ENTRY_NUM 128
 #define VIRT_BLK_DEVICEID 2
@@ -71,6 +73,30 @@ struct VRing {
 
 struct VirtQueue {
   struct VRing vring;
+};
+
+#define VIRTIO_BLK_T_IN           0
+#define VIRTIO_BLK_T_OUT          1
+#define VIRTIO_BLK_T_FLUSH        4
+#define VIRTIO_BLK_T_DISCARD      11
+#define VIRTIO_BLK_T_WRITE_ZEROES 13
+
+#define VIRTIO_BLK_S_OK     0
+#define VIRTIO_BLK_S_IOERR  1
+#define VIRTIO_BLK_S_UNSUPP 2
+
+struct virtio_blk_req {
+  uint32 type;
+  uint32 reserved;
+  uint64 sector;
+  uint8 *data[512];
+  uint8 status;
+};
+
+struct virtio_blk_discard_write_zeroes {
+  uint64 sector;
+  uint32 num_sectors;
+  uint32 flags;
 };
 
 static inline uint32 get_virt_mmio(uint32 *base, int offset)

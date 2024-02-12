@@ -41,6 +41,7 @@ int init_virtqueue(uint32 *base)
   // Read maxium queue size (number of elements) from QueueNumMax.
   int max_size = get_virt_mmio(base, VIRT_MMIO_QUEUE_MAX);
   if(max_size == 0x0) {
+    printf("キューの最大数が0です\n");
     return 1;
   }
   // Allocate and zero the queue memory, making sure the memory is physically contiguous.
