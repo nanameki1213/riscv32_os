@@ -112,6 +112,8 @@ struct virtio_blk_discard_write_zeroes {
   uint32 flags;
 };
 
+struct virtio_blk_req *virt_req;
+
 static inline uint32 get_virt_mmio(uint32 *base, int offset)
 {
   return *(uint32*)((uint32)base + offset);

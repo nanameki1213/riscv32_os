@@ -55,6 +55,9 @@ int init_virtqueue(uint32 *base)
   // Write 0x1 to QueueReady
   set_virt_mmio(base, VIRT_MMIO_QUEUE_READY, 0x1);
 
+  // リクエスト用の構造体の領域を割り当て
+  virt_req = (struct virtio_blk_req)alloc_page();
+
   return 0; 
 }
 
@@ -66,5 +69,4 @@ void init_disk(uint32 *base)
 
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
-
 }
