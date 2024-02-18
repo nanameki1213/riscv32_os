@@ -3,6 +3,8 @@
 
 #include "defines.h"
 
+#define SECTOR_SIZE 512
+
 #define VIRT_MMIO_NUM 8
 #define VIRTQ_ENTRY_NUM 128
 #define VIRT_BLK_DEVICEID 2
@@ -38,11 +40,20 @@
 #define VIRT_MMIO_STAT_DEVICE_NEEDS_RESET (1<<4)
 #define VIRT_MMIO_STAT_FAILED (1<<5)
 
-struct VRingDesc {
+struct VirtqDesc {
   uint64 addr;
   uint32 len;
+
+#define VIRTQ_DESC_F_NEXT (1<<0)
+#define VIRTQ_DESC_F_WRITE (1<<1)
+#define VIRTQ_DESC_F_INDIRECT (1<<2)
+
   uint16 flags;
   uint16 next;
+};
+
+struct VRingDesc {
+  struct VirtqDesc desc[VIRTQ_ENTRY_NUM];
 };
 
 struct VRingAvail {

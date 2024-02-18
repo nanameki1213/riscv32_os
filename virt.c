@@ -66,5 +66,5 @@ void init_disk(uint32 *base)
 
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
-  
+
 }
