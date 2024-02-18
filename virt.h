@@ -75,6 +75,8 @@ struct VirtQueue {
   struct VRing vring;
 };
 
+struct VirtQueue *queue;
+
 #define VIRTIO_BLK_T_IN           0
 #define VIRTIO_BLK_T_OUT          1
 #define VIRTIO_BLK_T_FLUSH        4

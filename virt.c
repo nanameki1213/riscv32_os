@@ -45,7 +45,7 @@ int init_virtqueue(uint32 *base)
     return 1;
   }
   // Allocate and zero the queue memory, making sure the memory is physically contiguous.
-  struct VirtQueue *queue = alloc_page();
+  queue = (struct VirtQueue*)alloc_page();
   // Notify the device about the queue size by writing the size to QueueNum
   set_virt_mmio(base, VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
   // Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
@@ -62,4 +62,9 @@ void init_disk(uint32 *base)
 {
   init_virt_disk(base);
   init_virtqueue(base);
+}
+
+void read_write_disc(void *buf, unsigned sector, int is_write)
+{
+  
 }
