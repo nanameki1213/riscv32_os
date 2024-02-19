@@ -1,6 +1,7 @@
 #include "memlayout.h"
 #include "defines.h"
 #include "virt.h"
+#include "lib.h"
 
 int init_virt_disk(uint32 *base)
 {
@@ -69,4 +70,17 @@ void init_disk(uint32 *base)
 
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
+  // リクエストを構築
+  virt_req->type = (is_write == 1) ? VIRTIO_BLK_T_IN : VIRTIO_BLK_T_OUT;
+  virt_req->sector = sector;
+  memcpy(virt_req->data, buf, SECTOR_SIZE);
+
+  // ディスクリプタを構築
+  struct VirtqDesc desc;
+  desc.addr = (uint64*)virt_req;
+  desc.len = sizeof(struct virtio_blk_req);
+  desc.flags &= ~(VIRTQ_DESC_F_WRITE); // デバイスからはread-onlyにする
+  desc.next = 0;
+  // ディスクリプタを登録
+  queue->vring.desc[0] = desc;
 }

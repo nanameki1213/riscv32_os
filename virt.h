@@ -40,8 +40,8 @@
 #define VIRT_MMIO_STAT_DEVICE_NEEDS_RESET (1<<4)
 #define VIRT_MMIO_STAT_FAILED (1<<5)
 
-struct VirtqDesc {
-  uint64 addr;
+struct VRingDesc {
+  uint64 *addr;
   uint32 len;
 
 #define VIRTQ_DESC_F_NEXT (1<<0)
@@ -50,10 +50,6 @@ struct VirtqDesc {
 
   uint16 flags;
   uint16 next;
-};
-
-struct VRingDesc {
-  struct VirtqDesc desc[VIRTQ_ENTRY_NUM];
 };
 
 struct VRingAvail {
@@ -77,7 +73,7 @@ struct VRing {
   uint32 num;
   uint32 num_default;
   uint32 align;
-  struct VRingDesc desc;
+  struct VRingDesc desc[VIRTQ_ENTRY_NUM];
   struct VRingAvail avail;
   struct VRingUsed used;
 };
@@ -102,7 +98,7 @@ struct virtio_blk_req {
   uint32 type;
   uint32 reserved;
   uint64 sector;
-  uint8 *data[512];
+  uint8 data[512];
   uint8 status;
 };
 
