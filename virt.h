@@ -6,7 +6,7 @@
 #define SECTOR_SIZE 512
 
 #define VIRT_MMIO_NUM 8
-#define VIRTQ_ENTRY_NUM 128
+#define VIRTQ_ENTRY_NUM 32
 #define VIRT_BLK_DEVICEID 2
 
 #define VIRT_MMIO_MAGIC 0x00

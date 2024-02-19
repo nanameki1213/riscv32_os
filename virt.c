@@ -83,4 +83,8 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   desc.next = 0;
   // ディスクリプタを登録
   queue->vring.desc[0] = desc;
+  // 使用可能リングの構築
+  struct VRingAvail avail;
+  avail.ring[0] = 0;
+  avail.idx = 1;
 }
