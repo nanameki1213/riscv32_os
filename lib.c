@@ -173,6 +173,17 @@ void *memcpy(void *dest, const void *src, size_t n)
   return dest;
 }
 
+void *memset(void *dest, int val, size_t n)
+{
+  char c = (char)val;
+  char *d = dest;
+  for(int i = 0; i < n; i++) {
+    d[i] = c;
+  }
+
+  return dest;
+}
+
 int memcmp(const void *buf1, const void *buf2, size_t n)
 {
   const char *b1 = buf1, *b2 = buf2;

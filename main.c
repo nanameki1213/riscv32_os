@@ -109,6 +109,9 @@ int main(void)
 
   // ディスクの初期化
   init_disk(VIRT_MMIO);
+  char buf[512];
+  read_write_disc(buf, 0, 0);
+  printf("sector 0 : %s", buf);
 
   init_memstat();
   // set_kernel_page();

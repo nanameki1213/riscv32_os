@@ -47,6 +47,7 @@ int init_virtqueue(uint32 *base)
   }
   // Allocate and zero the queue memory, making sure the memory is physically contiguous.
   queue = (struct VirtQueue*)alloc_page();
+  memset(queue, 0, sizeof(struct VirtQueue));
   // Notify the device about the queue size by writing the size to QueueNum
   set_virt_mmio(base, VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
   // Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
@@ -57,7 +58,7 @@ int init_virtqueue(uint32 *base)
   set_virt_mmio(base, VIRT_MMIO_QUEUE_READY, 0x1);
 
   // リクエスト用の構造体の領域を割り当て
-  virt_req = (struct virtio_blk_req)alloc_page();
+  virt_req = (struct virtio_blk_req*)alloc_page();
 
   return 0; 
 }
@@ -73,10 +74,12 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   // リクエストを構築
   virt_req->type = (is_write == 1) ? VIRTIO_BLK_T_IN : VIRTIO_BLK_T_OUT;
   virt_req->sector = sector;
-  memcpy(virt_req->data, buf, SECTOR_SIZE);
+  if(is_write) {
+    memcpy(virt_req->data, buf, SECTOR_SIZE);
+  }
 
   // ディスクリプタを構築
-  struct VirtqDesc desc;
+  struct VRingDesc desc;
   desc.addr = (uint64*)virt_req;
   desc.len = sizeof(struct virtio_blk_req);
   desc.flags &= ~(VIRTQ_DESC_F_WRITE); // デバイスからはread-onlyにする
@@ -87,4 +90,20 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   struct VRingAvail avail;
   avail.ring[0] = 0;
   avail.idx = 1;
+  // 使用可能リングに新たなエントリを登録
+  queue->vring.avail = avail;
+
+  // デバイスがリクエストを処理するまで待機
+  while(queue->vring.used.idx == 0) {
+    ;
+  }
+
+  if(virt_req->status == VIRTIO_BLK_S_IOERR ||
+     virt_req->status == VIRTIO_BLK_S_UNSUPP) {
+    printf("エラー発生\n");
+  }
+
+  if(is_write == 0) {
+    memcpy(buf, virt_req->data, SECTOR_SIZE);
+  }
 }
