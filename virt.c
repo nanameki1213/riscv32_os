@@ -69,6 +69,11 @@ void init_disk(uint32 *base)
   init_virtqueue(base);
 }
 
+void add_desc(struct VirtQueue *queue, struct VRingDesc desc)
+{
+  queue->vring.desc[queue->desc_idx++] = desc;
+}
+
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
@@ -85,7 +90,7 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   desc.flags &= ~(VIRTQ_DESC_F_WRITE); // デバイスからはread-onlyにする
   desc.next = 0;
   // ディスクリプタを登録
-  queue->vring.desc[0] = desc;
+  add_desc(queue, desc);
   // 使用可能リングの構築
   struct VRingAvail avail;
   avail.ring[0] = 0;

@@ -79,6 +79,7 @@ struct VRing {
 };
 
 struct VirtQueue {
+  int desc_idx;
   struct VRing vring;
 };
 
