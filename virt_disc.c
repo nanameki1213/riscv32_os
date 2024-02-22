@@ -74,6 +74,15 @@ void add_desc(struct VirtQueue *queue, struct VRingDesc desc)
   queue->vring.desc[queue->desc_idx++] = desc;
 }
 
+void notify_to_device(uint32 *base, struct VirtQueue *queue)
+{
+  set_virt_mmio(base, VIRT_MMIO_QUEUE_NOTIFY, queue->desc_idx);
+}
+
+/// @brief ディスクの読み書きAPI
+/// @param buf 読み込んだデータまたは書き込むデータ
+/// @param sector 操作対象のセクタ番号
+/// @param is_write 1: 書き込み，0: 読み込み
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
@@ -97,7 +106,8 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   avail.idx = 1;
   // 使用可能リングに新たなエントリを登録
   queue->vring.avail = avail;
-
+  // デバイスに通知
+  notify_to_device(VIRT_MMIO, queue);
   // デバイスがリクエストを処理するまで待機
   while(queue->vring.used.idx == 0) {
     ;
