@@ -1,5 +1,4 @@
-#ifndef VIRT_H
-#define VIRT_H
+#pragma once
 
 #include "defines.h"
 
@@ -83,8 +82,6 @@ struct VirtQueue {
   struct VRing vring;
 };
 
-struct VirtQueue *queue;
-
 #define VIRTIO_BLK_T_IN           0
 #define VIRTIO_BLK_T_OUT          1
 #define VIRTIO_BLK_T_FLUSH        4
@@ -109,8 +106,6 @@ struct virtio_blk_discard_write_zeroes {
   uint32 flags;
 };
 
-struct virtio_blk_req *virt_req;
-
 static inline uint32 get_virt_mmio(uint32 *base, int offset)
 {
   return *(uint32*)((uint32)base + offset);
@@ -120,5 +115,3 @@ static inline void set_virt_mmio(uint32 *base, int offset, uint32 value)
 {
   *(uint32*)((uint32)base + offset) = value;
 }
-
-#endif

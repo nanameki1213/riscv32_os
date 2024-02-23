@@ -1,4 +1,8 @@
 #include "virt.h"
+// 共通リクエスト構造体(TODO: 複数のリクエストを作成できるようにする)
+struct virtio_blk_req *common_virt_req;
+// 共通virtキュー(TODO: 複数のキューを扱えるようにする)
+struct VirtQueue *common_virt_queue;
 
 int init_virt_disk(uint32 *base)
 {
@@ -43,19 +47,19 @@ int init_virtqueue(uint32 *base)
     return 1;
   }
   // Allocate and zero the queue memory, making sure the memory is physically contiguous.
-  queue = (struct VirtQueue*)alloc_page();
-  memset(queue, 0, sizeof(struct VirtQueue));
+  common_virt_queue = (struct VirtQueue*)alloc_page();
+  memset(common_virt_queue, 0, sizeof(struct VirtQueue));
   // Notify the device about the queue size by writing the size to QueueNum
   set_virt_mmio(base, VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
   // Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DESC_LOW, (uint32)&(queue->vring.desc));
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DRIVER_LOW, (uint32)&(queue->vring.avail));
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DEVICE_LOW, (uint32)&(queue->vring.used));
+  set_virt_mmio(base, VIRT_MMIO_QUEUE_DESC_LOW, (uint32)&(common_virt_queue->vring.desc));
+  set_virt_mmio(base, VIRT_MMIO_QUEUE_DRIVER_LOW, (uint32)&(common_virt_queue->vring.avail));
+  set_virt_mmio(base, VIRT_MMIO_QUEUE_DEVICE_LOW, (uint32)&(common_virt_queue->vring.used));
   // Write 0x1 to QueueReady
   set_virt_mmio(base, VIRT_MMIO_QUEUE_READY, 0x1);
 
   // リクエスト用の構造体の領域を割り当て
-  virt_req = (struct virtio_blk_req*)alloc_page();
+  common_virt_req = (struct virtio_blk_req*)alloc_page();
 
   return 0; 
 }
@@ -66,12 +70,15 @@ void init_disk(uint32 *base)
   init_virtqueue(base);
 }
 
-void add_desc(struct VirtQueue *queue, struct VRingDesc desc)
+void add_single_desc(struct VirtQueue *queue, struct VRingDesc desc)
 {
   queue->vring.desc[queue->desc_idx++] = desc;
 }
 
 void notify_to_device(uint32 *base, struct VirtQueue *queue)
 {
+  // 使用可能リングを更新
+  queue->vring.avail.ring[queue->vring.avail.idx++] = queue->desc_idx;
+  // デバイスに通知
   set_virt_mmio(base, VIRT_MMIO_QUEUE_NOTIFY, queue->desc_idx);
 }
