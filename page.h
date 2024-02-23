@@ -1,5 +1,4 @@
-#ifndef PAGE_H
-#define PAGE_H
+#pragma once
 
 #include "defines.h"
 
@@ -22,5 +21,3 @@ typedef uint16 va2_t;
 #define PTE_W (1<<2)
 #define PTE_R (1<<1)
 #define PTE_V (1<<0)
-
-#endif

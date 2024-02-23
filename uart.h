@@ -1,5 +1,4 @@
-#ifndef UART_H
-#define UART_H
+#pragma once
 
 #define UART_BASE_ADDR (0x10000000)
 #define NS16550_RBR 0
@@ -23,5 +22,3 @@ unsigned char uart_rx();
 int uart_intr_is_recv_enable();
 void uart_intr_recv_enable();
 void uart_intr_recv_disable();
-
-#endif

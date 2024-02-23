@@ -1,5 +1,4 @@
-#ifndef RISCV_H_
-#define RISCV_H_
+#pragma once
 
 #define INTR_SOURCES_NUM 96
 #define INTR_PRIORITY_MAX 7
@@ -175,6 +174,3 @@ static inline void set_mip(int x)
 {
   asm volatile("csrw mip, %0" : "=r"(x));
 }
-
-
-#endif

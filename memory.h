@@ -1,5 +1,4 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#pragma once
 
 #include "riscv.h"
 
@@ -11,5 +10,3 @@ typedef unsigned char memstat;
 #define MEMSTAT_AVA  0 // 使用可能
 #define MEMSTAT_OS   1 // OSが使用中
 #define MEMSTAT_PERL 2 // ペリフェラルが使用中
-
-#endif

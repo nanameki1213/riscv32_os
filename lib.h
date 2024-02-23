@@ -1,5 +1,4 @@
-#ifndef LIB_H
-#define LIB_H
+#pragma once
 
 typedef unsigned int size_t;
 
@@ -26,5 +25,3 @@ void *memset(void *dest, int val, size_t n);
 int memcmp(const void *buf1, const void *buf2, size_t n);
 
 int cpuid();
-
-#endif
