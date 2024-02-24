@@ -3,7 +3,7 @@
 #include "virt.h"
 #include "lib.h"
 
-extern struct virtio_blk_req *common_virt_req;
+extern struct virtio_blk_req *blk_req;
 extern struct VirtQueue *common_virt_queue;
 
 /// @brief ディスクの読み書きAPI
@@ -13,15 +13,10 @@ extern struct VirtQueue *common_virt_queue;
 void read_write_disc(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
-  common_virt_req->type = (is_write == 1) ? VIRTIO_BLK_T_IN : VIRTIO_BLK_T_OUT;
-  common_virt_req->sector = sector;
-  if(is_write) {
-    memcpy(common_virt_req->data, buf, SECTOR_SIZE);
-  }
-
+  struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
   // ディスクリプタを構築
   struct VRingDesc desc;
-  desc.addr = (uint64*)common_virt_req;
+  desc.addr = (uint64*)req;
   desc.len = sizeof(struct virtio_blk_req);
   desc.flags &= ~(VIRTQ_DESC_F_WRITE); // デバイスからはread-onlyにする
   desc.next = 0;
@@ -44,12 +39,12 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
     ;
   }
 
-  if(common_virt_req->status == VIRTIO_BLK_S_IOERR ||
-     common_virt_req->status == VIRTIO_BLK_S_UNSUPP) {
+  if(req->status == VIRTIO_BLK_S_IOERR ||
+     req->status == VIRTIO_BLK_S_UNSUPP) {
     printf("エラー発生\n");
   }
 
   if(is_write == 0) {
-    memcpy(buf, common_virt_req->data, SECTOR_SIZE);
+    memcpy(buf, req->data, SECTOR_SIZE);
   }
 }

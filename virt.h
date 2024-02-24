@@ -4,6 +4,8 @@
 
 #define SECTOR_SIZE 512
 
+#define VIRT_BLK_REQ_MAX_NUM 32
+
 #define VIRT_MMIO_NUM 8
 #define VIRTQ_ENTRY_NUM 32
 #define VIRT_BLK_DEVICEID 2
@@ -79,6 +81,7 @@ struct VRing {
 
 struct VirtQueue {
   int desc_idx;
+  int top_desc_idx;
   struct VRing vring;
 };
 
