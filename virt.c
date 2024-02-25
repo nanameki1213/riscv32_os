@@ -6,7 +6,7 @@ int blk_req_idx = 0;
 // 共通virtキュー(TODO: 複数のキューを扱えるようにする)
 struct VirtQueue *common_virt_queue;
 
-int init_virtqueue(uint32 *base, struct VirtQueue *queue)
+int init_virtqueue(uint32 *base, struct VirtQueue **queue_addr)
 {
   // Select the queue writing its index to QueueSel.
   set_virt_mmio(base, VIRT_MMIO_QUEUE_SEL, 0);
@@ -21,11 +21,7 @@ int init_virtqueue(uint32 *base, struct VirtQueue *queue)
     return 1;
   }
   // Allocate and zero the queue memory, making sure the memory is physically contiguous.
-  queue = (struct VirtQueue*)alloc_page();
-  printf("address of queue: 0x%x\n", queue);
-  printf("desc address: 0x%x\n", (uint32)&(queue->vring.desc));
-  printf("avail address: 0x%x\n", (uint32)&(queue->vring.avail));
-  printf("used address: 0x%x\n", (uint32)&(queue->vring.used));
+  struct VirtQueue *queue = (struct VirtQueue*)alloc_page();
   memset(queue, 0, sizeof(struct VirtQueue));
   // Notify the device about the queue size by writing the size to QueueNum
   set_virt_mmio(base, VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
@@ -36,6 +32,12 @@ int init_virtqueue(uint32 *base, struct VirtQueue *queue)
   // Write 0x1 to QueueReady
   set_virt_mmio(base, VIRT_MMIO_QUEUE_READY, 0x1);
 
+  *queue_addr = queue;
+  // printf("address of queue: 0x%x\n", *queue_addr);
+  // printf("desc address: 0x%x\n", (uint32)&(queue->vring.desc));
+  // printf("avail address: 0x%x\n", (uint32)&(queue->vring.avail));
+  // printf("used address: 0x%x\n", (uint32)&(queue->vring.used));
+
   // リクエスト用の構造体の領域を割り当て
   blk_req = (struct virtio_blk_req*)alloc_page();
 
@@ -45,8 +47,10 @@ int init_virtqueue(uint32 *base, struct VirtQueue *queue)
 void init_disk(uint32 *base)
 {
   init_virt_disk(base);
-  init_virtqueue(base, common_virt_queue);
+  init_virtqueue(base, &common_virt_queue);
+  printf("address of queue: 0x%x\n", common_virt_queue);
 }
+
 // 引数をもとに新たなリクエストを作成
 struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write)
 {
