@@ -38,8 +38,8 @@ int init_virt_disk(uint32 *base)
   // MMIOのconfig領域を紐づけ
   blk_config = (struct virtio_blk_config*)((intptr_t)base + VIRT_MMIO_CONFIG);
   // ディスクの容量を取得
-  blk_capacity = blk_config->capacity;
-  printf("ディスクの容量: %d bytes\n", blk_capacity * 512);
+  blk_capacity = blk_config->capacity * SECTOR_SIZE;
+  printf("ディスクの容量: %d bytes\n", blk_capacity);
 
   return 0;
 }
