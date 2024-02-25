@@ -1,6 +1,6 @@
 #pragma once
 
-typedef unsigned int size_t;
+#include "defines.h"
 
 #define va_list __builtin_va_list
 #define va_start(v, ...) __builtin_va_start(v, 0)

@@ -32,7 +32,8 @@
 #define VIRT_MMIO_QUEUE_DRIVER_HIGH 0x94
 #define VIRT_MMIO_QUEUE_DEVICE_LOW 0xa0
 #define VIRT_MMIO_QUEUE_DEVICE_HIGH 0xa4
-#define VIRT_MMIO_CONFIG 0xfc
+#define VIRT_MMIO_CONFIGGENE 0xfc
+#define VIRT_MMIO_CONFIG 0x100
 
 #define VIRT_MMIO_STAT_ACKNOWLEDGE (1<<0)
 #define VIRT_MMIO_STAT_DRIVER (1<<1)
@@ -109,12 +110,39 @@ struct virtio_blk_discard_write_zeroes {
   uint32 flags;
 };
 
-static inline uint32 get_virt_mmio(uint32 *base, int offset)
+struct virtio_blk_config {
+  uint64 capacity;
+  uint32 size_max;
+  uint32 seg_max;
+  struct virtio_blk_geometry {
+    uint16 cylinders;
+    uint8 heads;
+    uint8 sectors;
+  } geometry;
+  uint32 blk_size;
+  struct virtio_blk_topology {
+    uint8 physical_block_exp;
+    uint8 alignment_offset;
+    uint16 min_io_size;
+    uint32 opt_io_size;
+  } topology;
+  uint8 writeback;
+  uint8 unused0[3];
+  uint32 max_discard_sectors;
+  uint32 max_discard_seg;
+  uint32 discard_sector_alignment;
+  uint32 max_write_zeroes_sectors;
+  uint32 max_write_zeroes_seg;
+  uint8 write_zeroes_may_unmap;
+  uint8 unused1[3];
+};
+
+static inline uint32 get_virt_mmio(void *base, int offset)
 {
-  return *(uint32*)((uint32)base + offset);
+  return *(uint32*)((intptr_t)base + offset);
 }
 
-static inline void set_virt_mmio(uint32 *base, int offset, uint32 value)
+static inline void set_virt_mmio(void *base, int offset, uint32 value)
 {
-  *(uint32*)((uint32)base + offset) = value;
+  *(uint32*)((intptr_t)base + offset) = value;
 }
