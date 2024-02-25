@@ -108,7 +108,7 @@ int main(void)
   uart_intr_recv_enable();
 
   // ディスクの初期化
-  init_disk(VIRT_DISC_MMIO);
+  init_disk();
   char buf[512];
   read_write_disc(buf, 0, 0);
   printf("sector 0 : %s", buf);

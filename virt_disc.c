@@ -10,33 +10,31 @@ extern struct VirtQueue *common_virt_queue;
 unsigned blk_capacity;
 struct virtio_blk_config *blk_config;
 
-int init_virt_disk(uint32 *base)
+int init_virt_disk()
 {
-  printf("virt mmio base addr: 0x%x\n", base);
-  if(get_virt_mmio(base, VIRT_MMIO_MAGIC) != 0x74726976) {
+  if(get_virt_mmio(VIRT_MMIO_MAGIC) != 0x74726976) {
     printf("MAGIC value is ilegal\n");
     return 1;
   }
-  if(get_virt_mmio(base, VIRT_MMIO_DEVICEID) != VIRT_BLK_DEVICEID) {
-    printf("Device ID is ilegal: %d\n", get_virt_mmio(base, VIRT_MMIO_DEVICEID));
+  if(get_virt_mmio(VIRT_MMIO_DEVICEID) != VIRT_BLK_DEVICEID) {
+    printf("Device ID is ilegal: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
     return 1;
   }
   // Reset the device.
-  set_virt_mmio(base, VIRT_MMIO_STAT, 0x00);
+  set_virt_mmio(VIRT_MMIO_STATUS, 0x00);
   // Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
-  set_virt_mmio(base, VIRT_MMIO_STAT, get_virt_mmio(base, VIRT_MMIO_STAT) | VIRT_MMIO_STAT_ACKNOWLEDGE);
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STAT_ACKNOWLEDGE);
   // Set the DRIVER status bit: the guest OS knows how to drive the device.
-  set_virt_mmio(base, VIRT_MMIO_STAT, get_virt_mmio(base, VIRT_MMIO_STAT) | VIRT_MMIO_STAT_DRIVER);
-  if(!(get_virt_mmio(base, VIRT_MMIO_STAT) | VIRT_MMIO_STAT_DRIVER_OK)) {
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STAT_DRIVER);
+  if(!(get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STAT_DRIVER_OK)) {
     return 1;
   }
   // Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
-  set_virt_mmio(base, VIRT_MMIO_STAT, VIRT_MMIO_STAT_FEATURES_OK);
+  set_virt_mmio(VIRT_MMIO_STATUS, VIRT_MMIO_STAT_FEATURES_OK);
   // Set the DRIVER_OK status bit. At this point the device is "live".
-  set_virt_mmio(base, VIRT_MMIO_STAT, VIRT_MMIO_STAT_DRIVER_OK);
-
+  set_virt_mmio(VIRT_MMIO_STATUS, VIRT_MMIO_STAT_DRIVER_OK);
   // MMIOのconfig領域を紐づけ
-  blk_config = (struct virtio_blk_config*)((intptr_t)base + VIRT_MMIO_CONFIG);
+  blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISC_MMIO + VIRT_MMIO_CONFIG);
   // ディスクの容量を取得
   blk_capacity = blk_config->capacity * SECTOR_SIZE;
   printf("ディスクの容量: %d bytes\n", blk_capacity);
@@ -65,7 +63,7 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
   }
-  // デバイスに通知
+  // デバイスに通知(TODO: 引数にアドレスを直接渡しているが，なんとかしたい)
   notify_to_device(VIRT_DISC_MMIO, common_virt_queue);
   // ログを表示
   printf("idx: %d\n", common_virt_queue->vring.avail.idx);

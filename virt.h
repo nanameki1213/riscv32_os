@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defines.h"
+#include "memlayout.h"
 
 #define SECTOR_SIZE 512
 
@@ -14,25 +15,20 @@
 #define VIRT_MMIO_VERSION 0x04
 #define VIRT_MMIO_DEVICEID 0x08
 #define VIRT_MMIO_VENDERID 0x0c
-#define VIRT_MMIO_DEVICE_FEATURES 0x10
-#define VIRT_MMIO_DEVICE_FEATURES_SEL 0x14
-#define VIRT_MMIO_DRIVER_FEATURES 0x20
-#define VIRT_MMIO_DRIVER_FEATURES_SEL 0x24
+#define VIRT_MMIO_HOST_FEATURES 0x10
+#define VIRT_MMIO_HOST_FEATURES_SEL 0x14
+#define VIRT_MMIO_GUEST_FEATURES 0x20
+#define VIRT_MMIO_GUEST_FEATURES_SEL 0x24
+#define VIRT_MMIO_GUEST_PAEG_SIZE 0x28
 #define VIRT_MMIO_QUEUE_SEL 0x30
 #define VIRT_MMIO_QUEUE_MAX 0x34
 #define VIRT_MMIO_QUEUE_NUM 0x38
-#define VIRT_MMIO_QUEUE_READY 0x44
+#define VIRT_MMIO_QUEUE_ALIGN 0x3c
+#define VIRT_MMIO_QUEUE_PFN 0x40
 #define VIRT_MMIO_QUEUE_NOTIFY 0x50
-#define VIRT_MMIO_INTR_STAT 0x60
+#define VIRT_MMIO_INTR_STATUS 0x60
 #define VIRT_MMIO_INTR_ACK 0x64
-#define VIRT_MMIO_STAT 0x70
-#define VIRT_MMIO_QUEUE_DESC_LOW 0x80
-#define VIRT_MMIO_QUEUE_DESC_HIGH 0x84
-#define VIRT_MMIO_QUEUE_DRIVER_LOW 0x90
-#define VIRT_MMIO_QUEUE_DRIVER_HIGH 0x94
-#define VIRT_MMIO_QUEUE_DEVICE_LOW 0xa0
-#define VIRT_MMIO_QUEUE_DEVICE_HIGH 0xa4
-#define VIRT_MMIO_CONFIGGENE 0xfc
+#define VIRT_MMIO_STATUS 0x70
 #define VIRT_MMIO_CONFIG 0x100
 
 #define VIRT_MMIO_STAT_ACKNOWLEDGE (1<<0)
@@ -137,12 +133,12 @@ struct virtio_blk_config {
   uint8 unused1[3];
 };
 
-static inline uint32 get_virt_mmio(void *base, int offset)
+static inline uint32 get_virt_mmio(unsigned offset)
 {
-  return *(uint32*)((intptr_t)base + offset);
+  return *(uint32*)(VIRT_DISC_MMIO + offset);
 }
 
-static inline void set_virt_mmio(void *base, int offset, uint32 value)
+static inline void set_virt_mmio(unsigned offset, uint32 value)
 {
-  *(uint32*)((intptr_t)base + offset) = value;
+  *(uint32*)(VIRT_DISC_MMIO + offset) = value;
 }

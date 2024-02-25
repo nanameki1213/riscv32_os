@@ -6,33 +6,32 @@ int blk_req_idx = 0;
 // 共通virtキュー(TODO: 複数のキューを扱えるようにする)
 struct VirtQueue *common_virt_queue;
 
-int init_virtqueue(uint32 *base, struct VirtQueue **queue_addr)
+int init_virt_mmio()
 {
   // Select the queue writing its index to QueueSel.
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_SEL, 0);
+  set_virt_mmio(VIRT_MMIO_QUEUE_SEL, 0);
   // Check if the queue is not already in use
-  if(get_virt_mmio(base, VIRT_MMIO_QUEUE_READY) == 0x1) {
+  if(get_virt_mmio(VIRT_MMIO_QUEUE_PFN) != 0) {
+    printf("このキューはすでに使われています\n");
     return 1;
   }
   // Read maxium queue size (number of elements) from QueueNumMax.
-  int max_size = get_virt_mmio(base, VIRT_MMIO_QUEUE_MAX);
-  if(max_size == 0x0) {
-    printf("キューの最大数が0です\n");
+  int max_size = get_virt_mmio(VIRT_MMIO_QUEUE_MAX);
+  if(max_size == 0) { // キューが無効
     return 1;
   }
-  // Allocate and zero the queue memory, making sure the memory is physically contiguous.
+  printf("キューの最大数: %d\n", max_size);
+  // Allocate and zero the queue memory
   struct VirtQueue *queue = (struct VirtQueue*)alloc_page();
   memset(queue, 0, sizeof(struct VirtQueue));
-  // Notify the device about the queue size by writing the size to QueueNum
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
-  // Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DESC_LOW, (uint32)&(queue->vring.desc));
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DRIVER_LOW, (uint32)&(queue->vring.avail));
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_DEVICE_LOW, (uint32)&(queue->vring.used));
-  // Write 0x1 to QueueReady
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_READY, 0x1);
+  // Notify the device about the queue size by writing the size to QueueNum.
+  set_virt_mmio(VIRT_MMIO_QUEUE_NUM, 0);
+  // Notify the device about the used alignment by writing its value in bytes to QueueAlign.
+  set_virt_mmio(VIRT_MMIO_QUEUE_ALIGN, 0);
+  // Write the physical number of the first page of the queue to the QueuePFN register.
+  set_virt_mmio(VIRT_MMIO_QUEUE_PFN, queue);
 
-  *queue_addr = queue;
+  common_virt_queue = queue;
   // printf("address of queue: 0x%x\n", *queue_addr);
   // printf("desc address: 0x%x\n", (uint32)&(queue->vring.desc));
   // printf("avail address: 0x%x\n", (uint32)&(queue->vring.avail));
@@ -44,10 +43,10 @@ int init_virtqueue(uint32 *base, struct VirtQueue **queue_addr)
   return 0; 
 }
 
-void init_disk(uint32 *base)
+void init_disk()
 {
-  init_virt_disk(base);
-  init_virtqueue(base, &common_virt_queue);
+  init_virt_disk();
+  init_virt_mmio();
   printf("address of queue: 0x%x\n", common_virt_queue);
 }
 
@@ -74,5 +73,5 @@ void notify_to_device(uint32 *base, struct VirtQueue *queue)
   // 使用可能リングを更新
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
   // デバイスに通知
-  set_virt_mmio(base, VIRT_MMIO_QUEUE_NOTIFY, queue->top_desc_idx);
+  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, queue->top_desc_idx);
 }
