@@ -107,13 +107,13 @@ int main(void)
   intr_enable();
   uart_intr_recv_enable();
 
+  init_memstat();
   // ディスクの初期化
   init_disk();
   char buf[512];
   read_write_disc(buf, 0, 0);
   printf("sector 0 : %s", buf);
 
-  init_memstat();
   // set_kernel_page();
   page_enable();
 

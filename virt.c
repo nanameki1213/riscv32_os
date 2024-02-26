@@ -32,11 +32,6 @@ int init_virt_mmio()
   set_virt_mmio(VIRT_MMIO_QUEUE_PFN, queue);
 
   common_virt_queue = queue;
-  // printf("address of queue: 0x%x\n", *queue_addr);
-  // printf("desc address: 0x%x\n", (uint32)&(queue->vring.desc));
-  // printf("avail address: 0x%x\n", (uint32)&(queue->vring.avail));
-  // printf("used address: 0x%x\n", (uint32)&(queue->vring.used));
-
   // リクエスト用の構造体の領域を割り当て
   blk_req = (struct virtio_blk_req*)alloc_page();
 
@@ -74,4 +69,5 @@ void notify_to_device(uint32 *base, struct VirtQueue *queue)
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
   // デバイスに通知
   set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, queue->top_desc_idx);
+  queue->last_used_idx++;
 }

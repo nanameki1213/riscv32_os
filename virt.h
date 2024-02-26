@@ -68,18 +68,19 @@ struct VRingUsed {
 };
 
 struct VRing {
-  uint32 num;
-  uint32 num_default;
-  uint32 align;
   struct VRingDesc desc[VIRTQ_ENTRY_NUM];
   struct VRingAvail avail;
   struct VRingUsed used;
+  uint32 num;
+  uint32 num_default;
+  uint32 align;
 };
 
 struct VirtQueue {
+  struct VRing vring;
   int desc_idx;
   int top_desc_idx;
-  struct VRing vring;
+  unsigned last_used_idx;
 };
 
 #define VIRTIO_BLK_T_IN           0

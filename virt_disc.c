@@ -72,9 +72,10 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   }
   printf("used idx: %d\n", common_virt_queue->vring.used.idx);
   // デバイスがリクエストを処理するまで待機
-  while(common_virt_queue->vring.used.idx == 0) {
+  while(common_virt_queue->last_used_idx == common_virt_queue->vring.used.idx) {
     ;
   }
+  printf("処理完了: %d\n", common_virt_queue->vring.used.idx);
 
   if(req->status == VIRTIO_BLK_S_IOERR ||
      req->status == VIRTIO_BLK_S_UNSUPP) {
