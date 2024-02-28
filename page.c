@@ -1,5 +1,6 @@
 #include "riscv.h"
 #include "page.h"
+#include "memory.h"
 #include "defines.h"
 #include "lib.h"
 

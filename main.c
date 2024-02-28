@@ -2,9 +2,11 @@
 #include "uart.h"
 #include "interrupt.h"
 #include "memlayout.h"
+#include "memory.h"
 #include "defines.h"
 #include "riscv.h"
 #include "timer.h"
+#include "virt_disk.h"
 
 extern int m_vectors, s_vectors;
 extern int intr_serial;
@@ -104,13 +106,13 @@ int main(void)
 
   uart_intr_recv_enable();
 
-  init_memstat();
+  init_memory();
   // ディスクの初期化
   init_disk();
   char buf[512];
-  read_write_disc(buf, 0, 0);
+  read_write_disk(buf, 0, 0);
   printf("sector 0 : %s\n", buf);
-  
+
   // 割込み有効化
   external_intr_enable();
   intr_enable();

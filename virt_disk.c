@@ -1,6 +1,7 @@
 #include "memlayout.h"
 #include "defines.h"
 #include "virt.h"
+#include "virt_disk.h"
 #include "lib.h"
 
 extern struct virtio_blk_req *blk_req;
@@ -9,6 +10,13 @@ extern struct VirtQueue *common_virt_queue;
 
 unsigned blk_capacity;
 struct virtio_blk_config *blk_config;
+
+void init_disk()
+{
+  init_virt_disk();
+  init_virt_mmio();
+  printf("address of queue: 0x%x\n", common_virt_queue);
+}
 
 int init_virt_disk()
 {
@@ -47,7 +55,7 @@ int init_virt_disk()
 /// @param buf 読み込んだデータまたは書き込むデータ
 /// @param sector 操作対象のセクタ番号
 /// @param is_write 1: 書き込み，0: 読み込み
-void read_write_disc(void *buf, unsigned sector, int is_write)
+void read_write_disk(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
   struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);

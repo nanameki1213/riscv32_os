@@ -43,13 +43,6 @@ int init_virt_mmio()
   return 0;
 }
 
-void init_disk()
-{
-  init_virt_disk();
-  init_virt_mmio();
-  printf("address of queue: 0x%x\n", common_virt_queue);
-}
-
 // 引数をもとに新たなリクエストを作成
 struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write)
 {

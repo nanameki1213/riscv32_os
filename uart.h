@@ -1,6 +1,6 @@
 #pragma once
 
-#define UART_BASE_ADDR (0x10000000)
+#define UART_BASE_ADDR 0x10000000
 #define NS16550_RBR 0
 #define NS16550_THR 0
 #define NS16550_IER 1

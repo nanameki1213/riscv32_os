@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "interrupt.h"
 #include "defines.h"
 
 void start_timer(int ms)

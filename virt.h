@@ -147,3 +147,5 @@ static inline void set_virt_mmio(unsigned offset, uint32 value)
 {
   *(uint32*)(VIRT_DISC_MMIO + offset) = value;
 }
+
+int init_virt_mmio();

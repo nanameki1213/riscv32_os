@@ -4,8 +4,7 @@
 extern char memcho_start, freearea;
 extern memstat memcho[4096];
 
-// memchoの初期設定
-void init_memstat()
+void init_memory()
 {
   uint32 *memcho_addr = &memcho_start;
 
