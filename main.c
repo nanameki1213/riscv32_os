@@ -102,9 +102,6 @@ int main(void)
   extern char freearea;
   printf("freearea: 0x%x\n", &freearea);
 
-  // 割込み有効化
-  external_intr_enable();
-  intr_enable();
   uart_intr_recv_enable();
 
   init_memstat();
@@ -112,7 +109,11 @@ int main(void)
   init_disk();
   char buf[512];
   read_write_disc(buf, 0, 0);
-  printf("sector 0 : %s", buf);
+  printf("sector 0 : %s\n", buf);
+  
+  // 割込み有効化
+  external_intr_enable();
+  intr_enable();
 
   // set_kernel_page();
   page_enable();

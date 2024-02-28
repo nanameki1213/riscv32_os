@@ -20,6 +20,7 @@ int init_virt_disk()
     printf("Device ID is ilegal: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
     return 1;
   }
+  printf("デバイスID: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
   // Reset the device.
   set_virt_mmio(VIRT_MMIO_STATUS, 0x00);
   // Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
@@ -52,9 +53,9 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
   // ディスクリプタを構築
   struct VRingDesc desc;
-  desc.addr = (uint64*)req;
+  desc.addr = (intptr_t)req;
   desc.len = sizeof(struct virtio_blk_req);
-  desc.flags |= VIRTQ_DESC_F_WRITE; // デバイスからはread-onlyにする
+  desc.flags |= 0;
   desc.next = 0;
   // ディスクリプタを登録
   add_single_desc(common_virt_queue, desc);
@@ -63,8 +64,7 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
   }
-  // デバイスに通知(TODO: 引数にアドレスを直接渡しているが，なんとかしたい)
-  notify_to_device(VIRT_DISC_MMIO, common_virt_queue);
+  notify_to_device(common_virt_queue);
   // ログを表示
   printf("idx: %d\n", common_virt_queue->vring.avail.idx);
   for(int i = 0; i < common_virt_queue->vring.avail.idx; i++) {
@@ -72,7 +72,7 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
   }
   printf("used idx: %d\n", common_virt_queue->vring.used.idx);
   // デバイスがリクエストを処理するまで待機
-  while(common_virt_queue->last_used_idx == common_virt_queue->vring.used.idx) {
+  while(common_virt_queue->last_used_idx != common_virt_queue->vring.used.idx) {
     ;
   }
   printf("処理完了: %d\n", common_virt_queue->vring.used.idx);
@@ -86,5 +86,4 @@ void read_write_disc(void *buf, unsigned sector, int is_write)
     memcpy(buf, req->data, SECTOR_SIZE);
   }
 
-  blk_req_idx--;
 }

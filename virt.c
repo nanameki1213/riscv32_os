@@ -8,34 +8,39 @@ struct VirtQueue *common_virt_queue;
 
 int init_virt_mmio()
 {
-  // Select the queue writing its index to QueueSel.
+  // 1. Select the queue writing its index to QueueSel.
   set_virt_mmio(VIRT_MMIO_QUEUE_SEL, 0);
-  // Check if the queue is not already in use
-  if(get_virt_mmio(VIRT_MMIO_QUEUE_PFN) != 0) {
-    printf("このキューはすでに使われています\n");
+  // 2. Check if the queue is not already in use
+  if(get_virt_mmio(VIRT_MMIO_QUEUE_READY) != 0) {
+    printf("キューが使用中です\n");
     return 1;
   }
-  // Read maxium queue size (number of elements) from QueueNumMax.
+  // 3. Read maxium queue size (number of elements) from QueueNumMax.
   int max_size = get_virt_mmio(VIRT_MMIO_QUEUE_MAX);
   if(max_size == 0) { // キューが無効
     return 1;
   }
   printf("キューの最大数: %d\n", max_size);
-  // Allocate and zero the queue memory
+  // 4. Allocate and zero the queue memory
   struct VirtQueue *queue = (struct VirtQueue*)alloc_page();
   memset(queue, 0, sizeof(struct VirtQueue));
-  // Notify the device about the queue size by writing the size to QueueNum.
-  set_virt_mmio(VIRT_MMIO_QUEUE_NUM, 0);
-  // Notify the device about the used alignment by writing its value in bytes to QueueAlign.
-  set_virt_mmio(VIRT_MMIO_QUEUE_ALIGN, 0);
-  // Write the physical number of the first page of the queue to the QueuePFN register.
-  set_virt_mmio(VIRT_MMIO_QUEUE_PFN, queue);
+  // 5. Notify the device about the queue size by writing the size to QueueNum.
+  set_virt_mmio(VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
+  // 6. Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
+  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_LOW, (intptr_t)&queue->vring.desc & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_HIGH, (intptr_t)&queue->vring.desc >> 32);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_LOW, (intptr_t)&queue->vring.avail & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_HIGH, (intptr_t)&queue->vring.avail >> 32);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_LOW, (intptr_t)&queue->vring.used & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_HIGH, (intptr_t)&queue->vring.used >> 32);
+  // 7. Write 0x1 to QueueReady
+  set_virt_mmio(VIRT_MMIO_QUEUE_READY, 0x1);
 
   common_virt_queue = queue;
   // リクエスト用の構造体の領域を割り当て
   blk_req = (struct virtio_blk_req*)alloc_page();
 
-  return 0; 
+  return 0;
 }
 
 void init_disk()
@@ -63,7 +68,7 @@ void add_single_desc(struct VirtQueue *queue, struct VRingDesc desc)
   queue->vring.desc[queue->desc_idx++] = desc;
 }
 
-void notify_to_device(uint32 *base, struct VirtQueue *queue)
+void notify_to_device(struct VirtQueue *queue)
 {
   // 使用可能リングを更新
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
