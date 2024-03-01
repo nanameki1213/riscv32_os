@@ -1,5 +1,6 @@
 {
   "files.associations": {
-    "virt.h": "c"
+    "virt.h": "c",
+    "virt_disk.h": "c"
   }
 }

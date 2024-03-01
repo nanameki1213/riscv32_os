@@ -1,7 +1,7 @@
 #include "memlayout.h"
 #include "defines.h"
 #include "virt.h"
-#include "virt_disk.h"
+#include "disk.h"
 #include "lib.h"
 
 extern struct virtio_blk_req *blk_req;

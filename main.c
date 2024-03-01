@@ -6,7 +6,7 @@
 #include "defines.h"
 #include "riscv.h"
 #include "timer.h"
-#include "virt_disk.h"
+#include "disk.h"
 
 extern int m_vectors, s_vectors;
 extern int intr_serial;
