@@ -60,24 +60,40 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   // リクエストを構築
   struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
   // ディスクリプタを構築
-  struct VRingDesc desc;
-  desc.addr = (intptr_t)req;
-  desc.len = sizeof(struct virtio_blk_req);
-  desc.flags |= 0;
-  desc.next = 0;
+  struct VRingDesc desc[3] = {0};
+  printf("request structure addr: 0x%x\n", req);
+  desc[0].addr = (intptr_t)req;
+  desc[0].len = 16;
+  desc[0].flags = VIRTQ_DESC_F_NEXT;
+  desc[0].next = 1;
+  desc[1].addr = (intptr_t)req + 16;
+  desc[1].len = SECTOR_SIZE;
+  desc[1].flags = VIRTQ_DESC_F_NEXT;
+  desc[1].next = 2;
+  desc[2].addr = (intptr_t)req + 16 + SECTOR_SIZE;
+  desc[2].len = sizeof(uint8);
+  desc[2].flags = VIRTQ_DESC_F_WRITE;
+  desc[2].next = 0;
   // ディスクリプタを登録
-  add_single_desc(common_virt_queue, desc);
+  memcpy(common_virt_queue->vring.desc, desc, sizeof(struct VRingDesc) * 3);
+  common_virt_queue->top_desc_idx = 0;
+  common_virt_queue->desc_idx = 3;
   // ログを表示
-  printf("desc idx: %d\n", common_virt_queue->desc_idx);
+  printf("ディスクリプタテーブルの状態:\n");
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
+    printf("ring[%d]\n", i);
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
+    printf("addr: 0x%x\n", common_virt_queue->vring.desc[i].addr);
   }
+  printf("desc idx: %d\n", common_virt_queue->desc_idx);
   notify_to_device(common_virt_queue);
   // ログを表示
-  printf("idx: %d\n", common_virt_queue->vring.avail.idx);
+  printf("使用可能リングの状態:\n");
+  printf("avail idx: %d\n", common_virt_queue->vring.avail.idx);
   for(int i = 0; i < common_virt_queue->vring.avail.idx; i++) {
     printf("ring[%d]: %d\n", i, common_virt_queue->vring.avail.ring[i]);
   }
+  printf("使用済みリングの状態:\n");
   printf("used idx: %d\n", common_virt_queue->vring.used.idx);
   // デバイスがリクエストを処理するまで待機
   while(common_virt_queue->last_used_idx != common_virt_queue->vring.used.idx) {

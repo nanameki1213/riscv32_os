@@ -43,7 +43,7 @@
 #define VIRT_MMIO_STAT_FAILED (1<<5)
 
 struct VRingDesc {
-  uint64 *addr;
+  uint64 addr;
   uint32 len;
 
 #define VIRTQ_DESC_F_NEXT (1<<0)
@@ -145,7 +145,8 @@ static inline uint32 get_virt_mmio(unsigned offset)
 
 static inline void set_virt_mmio(unsigned offset, uint32 value)
 {
-  *(uint32*)(VIRT_DISC_MMIO + offset) = value;
+  uint32 *x = (intptr_t)VIRT_DISC_MMIO + offset;
+  *x = value;
 }
 
 int init_virt_mmio();

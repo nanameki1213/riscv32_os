@@ -27,11 +27,11 @@ int init_virt_mmio()
   // 5. Notify the device about the queue size by writing the size to QueueNum.
   set_virt_mmio(VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
   // 6. Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
-  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_LOW, (intptr_t)queue->vring.desc & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_LOW, (intptr_t)queue->vring.desc & 0xffffffff);
   set_virt_mmio(VIRT_MMIO_QUEUE_DESC_HIGH, (intptr_t)queue->vring.desc >> 32);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_LOW, (intptr_t)&queue->vring.avail & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_LOW, (intptr_t)&queue->vring.avail & 0xffffffff);
   set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_HIGH, (intptr_t)&queue->vring.avail >> 32);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_LOW, (intptr_t)&queue->vring.used & 0xffff);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_LOW, (intptr_t)&queue->vring.used & 0xffffffff);
   set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_HIGH, (intptr_t)&queue->vring.used >> 32);
   // 7. Write 0x1 to QueueReady
   set_virt_mmio(VIRT_MMIO_QUEUE_READY, 0x1);
@@ -66,6 +66,6 @@ void notify_to_device(struct VirtQueue *queue)
   // 使用可能リングを更新
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
   // デバイスに通知
-  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, queue->top_desc_idx);
+  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, 0);
   queue->last_used_idx++;
 }
