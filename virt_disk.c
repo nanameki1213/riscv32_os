@@ -39,9 +39,9 @@ int init_virt_disk()
     return 1;
   }
   // Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
-  set_virt_mmio(VIRT_MMIO_STATUS, VIRT_MMIO_STATUS_FEATURES_OK);
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_FEATURES_OK);
   // Set the DRIVER_OK status bit. At this point the device is "live".
-  set_virt_mmio(VIRT_MMIO_STATUS, VIRT_MMIO_STATUS_DRIVER_OK);
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_DRIVER_OK);
   // MMIOのconfig領域を紐づけ
   blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISC_MMIO + VIRT_MMIO_CONFIG);
   // ディスクの容量を取得
