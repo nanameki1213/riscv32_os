@@ -101,6 +101,11 @@ int main(void)
   // printf("intrstack:    0x%x\n", &intrstack);
   // printf("bootstack:    0x%x\n", &bootstack);
 
+  printf("size of uint8: %d\n", sizeof(uint8));
+  printf("size of uint16: %d\n", sizeof(uint16));
+  printf("size of uint32: %d\n", sizeof(uint32));
+  printf("size of uint64: %d\n", sizeof(uint64));
+
   extern char freearea;
   printf("freearea: 0x%x\n", &freearea);
 

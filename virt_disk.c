@@ -60,17 +60,17 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   // リクエストを構築
   struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
   // ディスクリプタを構築
+  printf("request structure addr: 0x%x\n", (intptr_t)req);
   struct VRingDesc desc[3] = {0};
-  printf("request structure addr: 0x%x\n", req);
-  desc[0].addr = (intptr_t)req;
-  desc[0].len = 16;
+  desc[0].addr = (uint64)req;
+  desc[0].len = sizeof(uint32) * 2 + sizeof(uint64);
   desc[0].flags = VIRTQ_DESC_F_NEXT;
   desc[0].next = 1;
-  desc[1].addr = (intptr_t)req + 16;
+  desc[1].addr = (uint64)req + desc[0].len;
   desc[1].len = SECTOR_SIZE;
   desc[1].flags = VIRTQ_DESC_F_NEXT;
   desc[1].next = 2;
-  desc[2].addr = (intptr_t)req + 16 + SECTOR_SIZE;
+  desc[2].addr = (uint64)req + desc[0].len + desc[1].len;
   desc[2].len = sizeof(uint8);
   desc[2].flags = VIRTQ_DESC_F_WRITE;
   desc[2].next = 0;
@@ -83,7 +83,8 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
     printf("ring[%d]\n", i);
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
-    printf("addr: 0x%x\n", common_virt_queue->vring.desc[i].addr);
+    printf("addr: 0x%x\n", (uint32)common_virt_queue->vring.desc[i].addr);
+    printf("next: %d\n", common_virt_queue->vring.desc[i].next);
   }
   printf("desc idx: %d\n", common_virt_queue->desc_idx);
   notify_to_device(common_virt_queue);
@@ -95,6 +96,8 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   }
   printf("使用済みリングの状態:\n");
   printf("used idx: %d\n", common_virt_queue->vring.used.idx);
+  // 割り込みステータスの状態
+  printf("割り込みステータスの状態: 0x%x\n", get_virt_mmio(VIRT_MMIO_INTR_STATUS));
   // デバイスがリクエストを処理するまで待機
   while(common_virt_queue->last_used_idx != common_virt_queue->vring.used.idx) {
     ;
