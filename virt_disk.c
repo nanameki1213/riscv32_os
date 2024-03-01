@@ -29,6 +29,8 @@ int init_virt_disk()
     return 1;
   }
   printf("デバイスID: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
+  // 以下はデバイスの初期化
+
   // 1. Reset the device.
   set_virt_mmio(VIRT_MMIO_STATUS, 0x00);
   // 2. Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
@@ -111,6 +113,9 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   while(common_virt_queue->last_used_idx != common_virt_queue->vring.used.idx) {
     ;
   }
+  // while(get_virt_mmio(VIRT_MMIO_INTR_STATUS) != 0x1) {
+  //   ;
+  // }
   printf("処理完了: %d\n", common_virt_queue->vring.used.idx);
 
   if(req->status == VIRTIO_BLK_S_IOERR ||

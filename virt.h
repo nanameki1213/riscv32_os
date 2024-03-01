@@ -7,6 +7,8 @@
 
 #define VIRT_BLK_REQ_MAX_NUM 32
 
+#define VIRT_DISK_DEFAULT_QUEUE 0
+
 #define VIRT_MMIO_NUM 8
 #define VIRTQ_ENTRY_NUM 32
 #define VIRT_BLK_DEVICEID 2
@@ -147,6 +149,7 @@ static inline uint32 get_virt_mmio(unsigned offset)
 static inline void set_virt_mmio(unsigned offset, uint32 value)
 {
   uint32 *x = (intptr_t)VIRT_DISC_MMIO + offset;
+  printf("writing addr 0x%x: 0x%x\n", (intptr_t)x, value);
   *x = value;
 }
 

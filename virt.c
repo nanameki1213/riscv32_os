@@ -9,7 +9,7 @@ struct VirtQueue *common_virt_queue;
 int init_virt_mmio()
 {
   // 1. Select the queue writing its index to QueueSel.
-  set_virt_mmio(VIRT_MMIO_QUEUE_SEL, 0);
+  set_virt_mmio(VIRT_MMIO_QUEUE_SEL, VIRT_DISK_DEFAULT_QUEUE);
   // 2. Check if the queue is not already in use
   if(get_virt_mmio(VIRT_MMIO_QUEUE_READY) != 0) {
     printf("キューが使用中です\n");
@@ -28,11 +28,11 @@ int init_virt_mmio()
   set_virt_mmio(VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
   // 6. Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
   set_virt_mmio(VIRT_MMIO_QUEUE_DESC_LOW, (intptr_t)queue->vring.desc & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_HIGH, (intptr_t)queue->vring.desc >> 32);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_HIGH, 0);
   set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_LOW, (intptr_t)&queue->vring.avail & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_HIGH, (intptr_t)&queue->vring.avail >> 32);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_HIGH, 0);
   set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_LOW, (intptr_t)&queue->vring.used & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_HIGH, (intptr_t)&queue->vring.used >> 32);
+  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_HIGH, 0);
   // 7. Write 0x1 to QueueReady
   set_virt_mmio(VIRT_MMIO_QUEUE_READY, 0x1);
 
@@ -66,6 +66,6 @@ void notify_to_device(struct VirtQueue *queue)
   // 使用可能リングを更新
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
   // デバイスに通知
-  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, 0);
+  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, VIRT_DISK_DEFAULT_QUEUE);
   queue->last_used_idx++;
 }
