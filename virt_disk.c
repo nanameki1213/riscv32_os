@@ -29,24 +29,33 @@ int init_virt_disk()
     return 1;
   }
   printf("デバイスID: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
-  // Reset the device.
+  // 1. Reset the device.
   set_virt_mmio(VIRT_MMIO_STATUS, 0x00);
-  // Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
+  // 2. Set the ACKNOWLEDGE status bit: the guest OS has noticed the device.
   set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_ACKNOWLEDGE);
-  // Set the DRIVER status bit: the guest OS knows how to drive the device.
+  // 3. Set the DRIVER status bit: the guest OS knows how to drive the device.
   set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_DRIVER);
-  if(!(get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_DRIVER_OK)) {
+  // 4. Read device feature bits,
+  // and write the subset of feature bits understood by the OS and driver to the device.
+
+  // 5. Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_FEATURES_OK);
+  // 6. Re-read device status to ensure the FEATURES_OK bit is still set
+  if(!(get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_FEATURES_OK)) {
+    printf("デバイスが使用できません\n");
     return 1;
   }
-  // Set the FEATURES_OK status bit. The driver MUST NOT accept new feature bits after this step.
-  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_FEATURES_OK);
-  // Set the DRIVER_OK status bit. At this point the device is "live".
-  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_DRIVER_OK);
+  // 7. Perform device-specific setup, including discovery of virtqueues for the device,
+  // optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues.
+
   // MMIOのconfig領域を紐づけ
   blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISC_MMIO + VIRT_MMIO_CONFIG);
   // ディスクの容量を取得
   blk_capacity = blk_config->capacity * SECTOR_SIZE;
   printf("ディスクの容量: %d bytes\n", blk_capacity);
+
+  // 8. Set the DRIVER_OK status bit. At this point the device is "live".
+  set_virt_mmio(VIRT_MMIO_STATUS, get_virt_mmio(VIRT_MMIO_STATUS) | VIRT_MMIO_STATUS_DRIVER_OK);
 
   return 0;
 }
