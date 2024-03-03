@@ -1,4 +1,4 @@
 *.o
 *.elf
 trace_log.sh
-trace-[1-9]*
+trace.log
