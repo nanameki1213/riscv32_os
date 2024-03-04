@@ -14,7 +14,10 @@ struct virtio_blk_config *blk_config;
 void init_disk()
 {
   init_virt_disk();
-  init_virt_mmio();
+  common_virt_queue = init_virt_mmio(VIRT_DISK_DEFAULT_QUEUE);
+	if(common_virt_queue == NULL) {
+		return;
+	}
   printf("address of queue: 0x%x\n", common_virt_queue);
 }
 
@@ -47,8 +50,7 @@ int init_virt_disk()
     printf("デバイスが使用できません\n");
     return 1;
   }
-  // 7. Perform device-specific setup, including discovery of virtqueues for the device,
-  // optional per-bus setup, reading and possibly writing the device's virtio configuration space, and population of virtqueues.
+  // 7. Perform device-specific setup, including discovery of virtqueues for the device
 
   // MMIOのconfig領域を紐づけ
   blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISC_MMIO + VIRT_MMIO_CONFIG);
@@ -98,7 +100,9 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
     printf("next: %d\n", common_virt_queue->vring.desc[i].next);
   }
   printf("desc idx: %d\n", common_virt_queue->desc_idx);
+
   notify_to_device(common_virt_queue);
+
   // ログを表示
   printf("使用可能リングの状態:\n");
   printf("avail idx: %d\n", common_virt_queue->vring.avail.idx);

@@ -2,6 +2,7 @@
 
 #include "defines.h"
 #include "memlayout.h"
+#include "stdbool.h"
 
 #define SECTOR_SIZE 512
 
@@ -88,6 +89,8 @@ struct VirtQueue {
   int desc_idx;
   int top_desc_idx;
   unsigned last_used_idx;
+
+  unsigned vq_idx;
 };
 
 #define VIRTIO_BLK_T_IN           0
@@ -149,8 +152,11 @@ static inline uint32 get_virt_mmio(unsigned offset)
 static inline void set_virt_mmio(unsigned offset, uint32 value)
 {
   uint32 *x = (intptr_t)VIRT_DISC_MMIO + offset;
-  printf("writing addr 0x%x: 0x%x\n", (intptr_t)x, value);
   *x = value;
 }
 
-int init_virt_mmio();
+struct VirtQueue *init_virt_mmio(int index);
+struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write);
+void add_single_desc(struct VirtQueue *queue, struct VRingDesc desc);
+void notify_to_device(struct VirtQueue *queue);
+bool is_queue_available(int index);

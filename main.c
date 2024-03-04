@@ -7,6 +7,7 @@
 #include "riscv.h"
 #include "timer.h"
 #include "disk.h"
+#include "stdbool.h"
 
 extern int m_vectors, s_vectors;
 extern int intr_serial;
