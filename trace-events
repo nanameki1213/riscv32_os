@@ -2,3 +2,6 @@ virtio_mmio_read
 virtio_mmio_write_offset
 virtio_queue_notify
 virtio_mmio_queue_write
+mmio_notify
+mmio_ready
+virtqueue_pop

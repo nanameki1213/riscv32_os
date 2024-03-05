@@ -15,7 +15,7 @@ OBJS += page.o memcho.o memory.o virt.o virt_disk.o
 
 TARGET = testboot
 
-CFLAGS = -I. -march=rv32gc
+CFLAGS = -O0 -I. -march=rv32gc
 
 LFLAGS = -m elf32lriscv -b elf32-littleriscv -nostdlib --no-relax
 

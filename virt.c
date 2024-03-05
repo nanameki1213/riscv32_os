@@ -12,13 +12,14 @@ struct VirtQueue *init_virt_mmio(int index)
   // 1. Select the queue writing its index to QueueSel.
   set_virt_mmio(VIRT_MMIO_QUEUE_SEL, index);
   // 2. Check if the queue is not already in use
-  if(get_virt_mmio(VIRT_MMIO_QUEUE_READY) != 0) {
+  if(get_virt_mmio(VIRT_MMIO_QUEUE_PFN) != 0) {
     printf("キューが使用中です\n");
     return NULL;
   }
   // 3. Read maxium queue size (number of elements) from QueueNumMax.
   int max_size = get_virt_mmio(VIRT_MMIO_QUEUE_MAX);
-  if(max_size == 0) { // キューが無効
+	int version = get_virt_mmio(VIRT_MMIO_VERSION);
+  if(max_size == 0 || version != 0x1) { // キューが無効
 		printf("キューが無効です\n");
     return NULL;
   }
@@ -29,15 +30,11 @@ struct VirtQueue *init_virt_mmio(int index)
   vq->vq_idx = index;
   // 5. Notify the device about the queue size by writing the size to QueueNum.
   set_virt_mmio(VIRT_MMIO_QUEUE_NUM, VIRTQ_ENTRY_NUM);
-  // 6. Write physical addresses of the queue's Descriptor Area, DriverArea and Device Area
-  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_LOW, (uint64)vq->vring.desc & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DESC_HIGH, 0);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_LOW, (uint64)&vq->vring.avail & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DRIVER_HIGH, 0);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_LOW, (uint64)&vq->vring.used & 0xffffffff);
-  set_virt_mmio(VIRT_MMIO_QUEUE_DEVICE_HIGH, 0);
-  // 7. Write 0x1 to QueueReady
-  set_virt_mmio(VIRT_MMIO_QUEUE_READY, 0x1);
+  // 6. Notify the device about the used alignment by writing its value in bytes to QueueAlign.
+	set_virt_mmio(VIRT_MMIO_QUEUE_ALIGN, 0);
+
+	// 7. Write the physical number of the first page of the queue to the QueuePFN register.
+	set_virt_mmio(VIRT_MMIO_QUEUE_PFN, vq->vring.desc);
 
   // リクエスト用の構造体の領域を割り当て
   blk_req = (struct virtio_blk_req*)alloc_page();
@@ -68,9 +65,8 @@ void notify_to_device(struct VirtQueue *queue)
   // 使用可能リングを更新
   queue->vring.avail.ring[queue->vring.avail.idx++] = queue->top_desc_idx;
   // デバイスに通知
-  printf("デバイスに通知します\n");
-  set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, VIRT_DISK_DEFAULT_QUEUE);
-  queue->last_used_idx++;
+	set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, VIRT_DISK_DEFAULT_QUEUE);
+	queue->last_used_idx++;
 }
 
 bool is_queue_available(int index)

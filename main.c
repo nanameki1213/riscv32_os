@@ -113,6 +113,10 @@ int main(void)
   uart_intr_recv_enable();
 
   init_memory();
+
+	if(is_queue_available(1)) {
+		printf("queue 1 is available\n");
+	}	
   // ディスクの初期化
   init_disk();
   char buf[512];

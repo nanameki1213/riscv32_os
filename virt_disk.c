@@ -53,7 +53,7 @@ int init_virt_disk()
   // 7. Perform device-specific setup, including discovery of virtqueues for the device
 
   // MMIOのconfig領域を紐づけ
-  blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISC_MMIO + VIRT_MMIO_CONFIG);
+  blk_config = (struct virtio_blk_config*)((intptr_t)VIRT_DISK_MMIO + VIRT_MMIO_CONFIG);
   // ディスクの容量を取得
   blk_capacity = blk_config->capacity * SECTOR_SIZE;
   printf("ディスクの容量: %d bytes\n", blk_capacity);
@@ -72,9 +72,13 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
   struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
+	// ログを表示
+	printf("リクエストを構築\n");
+	printf("sector: %d\n", req->sector);
+	printf("type: %d\n", req->type);
   // ディスクリプタを構築
   printf("request structure addr: 0x%x\n", (intptr_t)req);
-  struct VRingDesc desc[3] = {0};
+  struct VRingDesc *desc = common_virt_queue->vring.desc;
   desc[0].addr = (uint64)req;
   desc[0].len = sizeof(uint32) * 2 + sizeof(uint64);
   desc[0].flags = VIRTQ_DESC_F_NEXT;
@@ -88,9 +92,8 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   desc[2].flags = VIRTQ_DESC_F_WRITE;
   desc[2].next = 0;
   // ディスクリプタを登録
-  memcpy(common_virt_queue->vring.desc, desc, sizeof(struct VRingDesc) * 3);
   common_virt_queue->top_desc_idx = 0;
-  common_virt_queue->desc_idx = 3;
+  common_virt_queue->desc_idx += 3;
   // ログを表示
   printf("ディスクリプタテーブルの状態:\n");
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
