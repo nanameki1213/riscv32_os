@@ -1,6 +1,8 @@
 #include "virt.h"
 #include "lib.h"
 #include "stdbool.h"
+#include "stddef.h"
+
 // ブロックデバイスのリクエスト構造体(数はVIRTQ_REQ_MAX_NUMで定義)
 struct virtio_blk_req *blk_req;
 int blk_req_idx = 0;

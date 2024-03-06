@@ -1,29 +1,30 @@
 #include "riscv.h"
 #include "page.h"
 #include "memory.h"
-#include "defines.h"
 #include "lib.h"
+#include "stddef.h"
+#include "stdint.h"
 
 extern char kernel_base, kernel_end;
 
-void va_to_array(uint32 *src_addr, va2_t *va)
+void va_to_array(uint32_t *src_addr, va2_t *va)
 {
   va[0] = ((size_t)src_addr & 0xfff);
   va[1] = ((size_t)src_addr & 0x3fffff) >> 12;
   va[2] = (size_t)src_addr>>22;
 }
 
-uint32 *array_to_va(va2_t *va)
+uint32_t *array_to_va(va2_t *va)
 {
-  return (uint32*)(va[2]<<22 | va[1]<<12 | va[0]);
+  return (uint32_t*)(va[2]<<22 | va[1]<<12 | va[0]);
 }
 
 void set_kernel_page()
 {
-  uint32 *kernel_size = (&kernel_end - &kernel_base);
-  int devide_page_size = (uint32)kernel_size / PAGE_SIZE;
+  uint32_t *kernel_size = (&kernel_end - &kernel_base);
+  int devide_page_size = (uint32_t)kernel_size / PAGE_SIZE;
 
-  int kernel_page_size = ((uint32)kernel_size % PAGE_SIZE == 0) ? devide_page_size : devide_page_size + 1;
+  int kernel_page_size = ((uint32_t)kernel_size % PAGE_SIZE == 0) ? devide_page_size : devide_page_size + 1;
 
   // printf("base: %x\n", &kernel_base);
   // printf("end: %x\n", &kernel_end);
@@ -41,9 +42,9 @@ void page_disable()
   set_satp(get_satp() & ~SATP_SV32);
 }
 
-void identity_map(pte_t last_entry, uint32 *addr)
+void identity_map(pte_t last_entry, uint32_t *addr)
 {
-  uint32 *ram_page = ((uint32)addr - RAM_BASE_ADDR) / PAGE_SIZE;
+  uint32_t *ram_page = ((uint32_t)addr - RAM_BASE_ADDR) / PAGE_SIZE;
 
   
 
@@ -55,12 +56,12 @@ pte_t *set_new_map(pte_t entry)
     return (pte_t*)(entry>>10);
   }
 
-  uint32 *top_addr = alloc_page();
+  uint32_t *top_addr = alloc_page();
   if(top_addr == NULL) {
     return NULL;
   }
 
-  int page = (uint32)top_addr / PAGE_SIZE;
+  int page = (uint32_t)top_addr / PAGE_SIZE;
 
   entry |= PPN(page);
   entry |= PTE_V;
@@ -71,7 +72,7 @@ pte_t *set_new_map(pte_t entry)
 size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
 {
   while(page_num > 0) {
-    uint16 entry_index = addr[level];
+    uint16_t entry_index = addr[level];
 
     pte_t *child_pte = set_new_map(pte[entry_index]);
 
@@ -99,13 +100,13 @@ size_t setup_page(pte_t *pte, int level, va2_t *addr, size_t page_num)
   return page_num;
 }
 
-void setup_pages(uint32 *addr, size_t page_num)
+void setup_pages(uint32_t *addr, size_t page_num)
 {
   va2_t va[3];
   va_to_array(addr, va);
 
-  uint32 *pte = alloc_page();
-  set_satp(SATP_PPN((uint32)pte / 0x1000));
+  uint32_t *pte = alloc_page();
+  set_satp(SATP_PPN((uint32_t)pte / 0x1000));
 
   setup_page(pte, PAGE_LEVEL, addr, page_num);
 }

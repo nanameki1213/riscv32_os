@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defines.h"
+#include "stdint.h"
 #include "memlayout.h"
 #include "stdbool.h"
 
@@ -43,31 +43,31 @@
 #define VIRT_MMIO_STATUS_FAILED (1<<7)
 
 struct VRingDesc {
-  uint64 addr;
-  uint32 len;
+  uint64_t addr;
+  uint32_t len;
 
 #define VIRTQ_DESC_F_NEXT (1<<0)
 #define VIRTQ_DESC_F_WRITE (1<<1)
 #define VIRTQ_DESC_F_INDIRECT (1<<2)
 
-  uint16 flags;
-  uint16 next;
+  uint16_t flags;
+  uint16_t next;
 };
 
 struct VRingAvail {
-  uint16 flags;
-  uint16 idx;
-  uint16 ring[VIRTQ_ENTRY_NUM];
+  uint16_t flags;
+  uint16_t idx;
+  uint16_t ring[VIRTQ_ENTRY_NUM];
 };
 
 struct VRingUsedElem {
-  uint32 id;
-  uint32 len;
+  uint32_t id;
+  uint32_t len;
 };
 
 struct VRingUsed {
-  uint16 flags;
-  uint16 idx;
+  uint16_t flags;
+  uint16_t idx;
   struct VRingUsedElem ring[VIRTQ_ENTRY_NUM];
 };
 
@@ -75,9 +75,9 @@ struct VRing {
   struct VRingDesc desc[VIRTQ_ENTRY_NUM];
   struct VRingAvail avail;
   struct VRingUsed used;
-  uint32 num;
-  uint32 num_default;
-  uint32 align;
+  uint32_t num;
+  uint32_t num_default;
+  uint32_t align;
 };
 
 struct VirtQueue {
@@ -100,54 +100,54 @@ struct VirtQueue {
 #define VIRTIO_BLK_S_UNSUPP 2
 
 struct virtio_blk_req {
-  uint32 type;
-  uint32 reserved;
-  uint64 sector;
-  uint8 data[512];
-  uint8 status;
+  uint32_t type;
+  uint32_t reserved;
+  uint64_t sector;
+  uint8_t data[512];
+  uint8_t status;
 };
 
 struct virtio_blk_discard_write_zeroes {
-  uint64 sector;
-  uint32 num_sectors;
-  uint32 flags;
+  uint64_t sector;
+  uint32_t num_sectors;
+  uint32_t flags;
 };
 
 struct virtio_blk_config {
-  uint64 capacity;
-  uint32 size_max;
-  uint32 seg_max;
+  uint64_t capacity;
+  uint32_t size_max;
+  uint32_t seg_max;
   struct virtio_blk_geometry {
-    uint16 cylinders;
-    uint8 heads;
-    uint8 sectors;
+    uint16_t cylinders;
+    uint8_t heads;
+    uint8_t sectors;
   } geometry;
-  uint32 blk_size;
+  uint32_t blk_size;
   struct virtio_blk_topology {
-    uint8 physical_block_exp;
-    uint8 alignment_offset;
-    uint16 min_io_size;
-    uint32 opt_io_size;
+    uint8_t physical_block_exp;
+    uint8_t alignment_offset;
+    uint16_t min_io_size;
+    uint32_t opt_io_size;
   } topology;
-  uint8 writeback;
-  uint8 unused0[3];
-  uint32 max_discard_sectors;
-  uint32 max_discard_seg;
-  uint32 discard_sector_alignment;
-  uint32 max_write_zeroes_sectors;
-  uint32 max_write_zeroes_seg;
-  uint8 write_zeroes_may_unmap;
-  uint8 unused1[3];
+  uint8_t writeback;
+  uint8_t unused0[3];
+  uint32_t max_discard_sectors;
+  uint32_t max_discard_seg;
+  uint32_t discard_sector_alignment;
+  uint32_t max_write_zeroes_sectors;
+  uint32_t max_write_zeroes_seg;
+  uint8_t write_zeroes_may_unmap;
+  uint8_t unused1[3];
 };
 
-static inline uint32 get_virt_mmio(unsigned offset)
+static inline uint32_t get_virt_mmio(unsigned offset)
 {
-  return *(uint32*)(VIRT_DISK_MMIO + offset);
+  return *(uint32_t*)(VIRT_DISK_MMIO + offset);
 }
 
-static inline void set_virt_mmio(unsigned offset, uint32 value)
+static inline void set_virt_mmio(unsigned offset, uint32_t value)
 {
-	*((volatile uint32*)(VIRT_DISK_MMIO + offset)) = value;
+	*((volatile uint32_t*)(VIRT_DISK_MMIO + offset)) = value;
 }
 
 struct VirtQueue *init_virt_mmio(int index);

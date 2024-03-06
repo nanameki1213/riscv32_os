@@ -1,5 +1,6 @@
 #include "lib.h"
 #include "uart.h"
+#include "stddef.h"
 
 void printf(const char *fmt, ...) {
   va_list vargs;

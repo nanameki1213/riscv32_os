@@ -1,19 +1,20 @@
 #include "memory.h"
-#include "defines.h"
+#include "stddef.h"
+#include "stdint.h"
 
 extern char memcho_start, freearea;
 extern memstat memcho[4096];
 
 void init_memory()
 {
-  uint32 *memcho_addr = &memcho_start;
+  uint32_t *memcho_addr = &memcho_start;
 
-  uint32 *free_addr = &freearea;
+  uint32_t *free_addr = &freearea;
 
-  free_addr = (uint32*)((int)(free_addr) & ~(0xfff)); // 0x1000でアラインメント
+  free_addr = (uint32_t*)((int)(free_addr) & ~(0xfff)); // 0x1000でアラインメント
 
-  uint32 i;
-  for(i = 0; i < ((uint32)free_addr - RAM_BASE_ADDR)/0x1000; i += 1) {
+  uint32_t i;
+  for(i = 0; i < ((uint32_t)free_addr - RAM_BASE_ADDR)/0x1000; i += 1) {
     memcho[i] = MEMSTAT_OS;
   }
 
@@ -41,6 +42,6 @@ void *alloc_page()
 
 void free_page(void *mem)
 {
-  int page = ((uint32)mem - RAM_BASE_ADDR) / 0x1000;
+  int page = ((uint32_t)mem - RAM_BASE_ADDR) / 0x1000;
   memcho[page] = MEMSTAT_AVA;
 }

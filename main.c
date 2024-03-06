@@ -8,6 +8,9 @@
 #include "timer.h"
 #include "disk.h"
 #include "stdbool.h"
+#include "string.h"
+#include "stdint.h"
+#include "stddef.h"
 
 extern int m_vectors, s_vectors;
 extern int intr_serial;
@@ -65,28 +68,28 @@ int main(void)
   // PLICの初期設定
 
   // スレッショルドビットをクリア
-  *(uint32*)PLIC_THRESHOLD(id) = 0;
+  *(uint32_t*)PLIC_THRESHOLD(id) = 0;
 
   // プライオリティを設定
-  *(uint32*)PLIC_PRIORITY(UART0_IRQ) = INTR_PRIORITY_MAX;
-  *(uint32*)PLIC_PRIORITY(VIRTIO_IRQ) = INTR_PRIORITY_MAX;
+  *(uint32_t*)PLIC_PRIORITY(UART0_IRQ) = INTR_PRIORITY_MAX;
+  *(uint32_t*)PLIC_PRIORITY(VIRTIO_IRQ) = INTR_PRIORITY_MAX;
 
   // UARTの割り込みを許可
   int column = UART0_IRQ % 32;
   int row = UART0_IRQ / 32;
-  *(uint32*)(PLIC_ENABLE(id) + row) |= (1U<<column);
+  *(uint32_t*)(PLIC_ENABLE(id) + row) |= (1U<<column);
   // printf("column = %d\nrow = %d\n", column, row);
   // printf("plic enable addr = 0x%x\n", PLIC_ENABLE(id) + row);
 
   column = VIRTIO_IRQ % 32;
   row = VIRTIO_IRQ / 32;
-  *(uint32*)(PLIC_ENABLE(id) + row) |= (1U<<column);
+  *(uint32_t*)(PLIC_ENABLE(id) + row) |= (1U<<column);
 
   set_mideleg(get_mideleg() | xIE_SEIE | xIE_STIE | xIE_SSIE | MIE_MEIE | MIE_MTIE | MIE_MSIE); // Mモードから割り込みを移譲
-  // set_mtvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
-  // set_stvec((uint32)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
-  set_mtvec((uint32)(&m_vectors) | MODE_VECTOR);
-  set_stvec((uint32)(&s_vectors) | MODE_VECTOR);
+  // set_mtvec((uint32_t)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
+  // set_stvec((uint32_t)(&intr_serial) & MODE_DIRECT); // 割り込みベクタを登録
+  set_mtvec((uint32_t)(&m_vectors) | MODE_VECTOR);
+  set_stvec((uint32_t)(&s_vectors) | MODE_VECTOR);
 
   // extern char text_start;
   // extern char etext;
@@ -102,10 +105,10 @@ int main(void)
   // printf("intrstack:    0x%x\n", &intrstack);
   // printf("bootstack:    0x%x\n", &bootstack);
 
-  printf("size of uint8: %d\n", sizeof(uint8));
-  printf("size of uint16: %d\n", sizeof(uint16));
-  printf("size of uint32: %d\n", sizeof(uint32));
-  printf("size of uint64: %d\n", sizeof(uint64));
+  printf("size of uint8_t_t: %d\n", sizeof(uint8_t));
+  printf("size of uint16_t: %d\n", sizeof(uint16_t));
+  printf("size of uint32_t: %d\n", sizeof(uint32_t));
+  printf("size of uint64_t: %d\n", sizeof(uint64_t));
 
   extern char freearea;
   printf("freearea: 0x%x\n", &freearea);
@@ -114,9 +117,6 @@ int main(void)
 
   init_memory();
 
-	if(is_queue_available(1)) {
-		printf("queue 1 is available\n");
-	}	
   // ディスクの初期化
   init_disk();
   char buf[512];
@@ -131,7 +131,7 @@ int main(void)
   page_enable();
 
   puts("$ ");
-  // start_timer(1000);
+  start_timer(1000);
   while(1) {
     ;
   }

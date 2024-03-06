@@ -5,3 +5,4 @@ virtio_mmio_queue_write
 mmio_notify
 mmio_ready
 virtqueue_pop
+virtio_blk_rw_complete

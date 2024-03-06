@@ -1,8 +1,9 @@
 #include "memlayout.h"
-#include "defines.h"
 #include "virt.h"
 #include "disk.h"
 #include "lib.h"
+#include "stddef.h"
+#include "stdint.h"
 
 extern struct virtio_blk_req *blk_req;
 extern int blk_req_idx;
@@ -79,16 +80,16 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   // ディスクリプタを構築
   printf("request structure addr: 0x%x\n", (intptr_t)req);
   struct VRingDesc *desc = common_virt_queue->vring.desc;
-  desc[0].addr = (uint64)req;
-  desc[0].len = sizeof(uint32) * 2 + sizeof(uint64);
+  desc[0].addr = (uint64_t)req;
+  desc[0].len = sizeof(uint32_t) * 2 + sizeof(uint64_t);
   desc[0].flags = VIRTQ_DESC_F_NEXT;
   desc[0].next = 1;
-  desc[1].addr = (uint64)req + desc[0].len;
+  desc[1].addr = (uint64_t)req + desc[0].len;
   desc[1].len = SECTOR_SIZE;
   desc[1].flags = VIRTQ_DESC_F_NEXT;
   desc[1].next = 2;
-  desc[2].addr = (uint64)req + desc[0].len + desc[1].len;
-  desc[2].len = sizeof(uint8);
+  desc[2].addr = (uint64_t)req + desc[0].len + desc[1].len;
+  desc[2].len = sizeof(uint8_t);
   desc[2].flags = VIRTQ_DESC_F_WRITE;
   desc[2].next = 0;
   // ディスクリプタを登録
@@ -99,7 +100,7 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   for(int i = 0; i < common_virt_queue->desc_idx; i++) {
     printf("ring[%d]\n", i);
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
-    printf("addr: 0x%x\n", (uint32)common_virt_queue->vring.desc[i].addr);
+    printf("addr: 0x%x\n", (uint32_t)common_virt_queue->vring.desc[i].addr);
     printf("next: %d\n", common_virt_queue->vring.desc[i].next);
   }
   printf("desc idx: %d\n", common_virt_queue->desc_idx);

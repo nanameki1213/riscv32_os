@@ -1,8 +1,8 @@
 #include "interrupt.h"
 #include "riscv.h"
 #include "memlayout.h"
-#include "defines.h"
 #include "intr.h"
+#include "stdint.h"
 
 // 外部割込み有効化
 void external_intr_enable()
@@ -15,7 +15,7 @@ void external_intr_enable()
 // 外部割込み無効化
 void external_intr_disable()
 {
-  set_mie(get_mie() & ~(uint32)(MIE_MEIE | xIE_SEIE));
+  set_mie(get_mie() & ~(uint32_t)(MIE_MEIE | xIE_SEIE));
 }
 
 // タイマ割込み有効化
@@ -29,7 +29,7 @@ void timer_intr_enable()
 // タイマ割込み無効化
 void timer_intr_disable()
 {
-  set_mie(get_mie() & ~(uint32)(MIE_MTIE | xIE_STIE));
+  set_mie(get_mie() & ~(uint32_t)(MIE_MTIE | xIE_STIE));
 }
 
 // ソフトウェア割込み有効化
@@ -43,7 +43,7 @@ void software_intr_enable()
 // ソフトウェア割込み無効化
 void software_intr_disable()
 {
-  set_mie(get_mie() & ~(uint32)(MIE_MSIE | xIE_SSIE));
+  set_mie(get_mie() & ~(uint32_t)(MIE_MSIE | xIE_SSIE));
 }
 
 // S，Mモード両方の割込みを有効にする
@@ -63,9 +63,9 @@ void intr_enable()
 void intr_disable()
 {
   // set_sie(get_sie() & ~(xIE_SEIE | xIE_STIE | xIE_SSIE));
-  // set_mie(get_mie() & ~(uint32)(MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE));
+  // set_mie(get_mie() & ~(uint32_t)(MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE));
 
-  set_mstatus(get_mstatus() & ~(uint32)(MSTATUS_SIE | MSTATUS_MIE));
+  set_mstatus(get_mstatus() & ~(uint32_t)(MSTATUS_SIE | MSTATUS_MIE));
 }
 
 int is_intr_enable()
@@ -87,13 +87,13 @@ void interrupt(intr_type_t type, unsigned int sp)
 
   if(type == INTR_TYPE_EXLINTR) {
     // PLICに割込みclaimを送信
-    int irq = *(uint32*)PILC_CLAIM(id);
+    int irq = *(uint32_t*)PILC_CLAIM(id);
     if(irq == UART0_IRQ) {
       uart(type, sp);
     } else if(irq == VIRTIO_IRQ) {
     }
     // PLICにcomplete通知を行う
-    *(uint32*)PILC_CLAIM(id) = irq;
+    *(uint32_t*)PILC_CLAIM(id) = irq;
   } else if(type == INTR_TYPE_TIMINTR) {
     timer(type, sp);
   }

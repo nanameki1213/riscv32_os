@@ -1,17 +1,17 @@
 #pragma once
 
-#include "defines.h"
+#include "stdint.h"
 
 typedef unsigned int pte_t;
 
-typedef uint16 va2_t;
+typedef uint16_t va2_t;
 
 #define PAGE_LEVEL 2
 #define PAGE_SIZE 0x1000
 
-#define PPN(ppn) ((uint32)(ppn)<<10)
-#define PPN_1(ppn1) ((uint32)(ppn1)<<20)
-#define PPN_2(ppn2) ((uint32)(ppn2)<<10)
+#define PPN(ppn) ((uint32_t)(ppn)<<10)
+#define PPN_1(ppn1) ((uint32_t)(ppn1)<<20)
+#define PPN_2(ppn2) ((uint32_t)(ppn2)<<10)
 
 #define PTE_D (1<<7)
 #define PTE_A (1<<6)
