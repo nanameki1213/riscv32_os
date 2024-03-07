@@ -2,7 +2,8 @@
 #include "riscv.h"
 #include "memlayout.h"
 #include "intr.h"
-#include "stdint.h"
+#include <stdint.h>
+#include "intr_handler.h"
 
 // 外部割込み有効化
 void external_intr_enable()

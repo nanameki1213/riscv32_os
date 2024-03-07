@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdint.h"
+#include "stddef.h"
 
 typedef unsigned int pte_t;
 
@@ -25,3 +26,4 @@ typedef uint16_t va2_t;
 void set_kernel_page();
 void page_enable();
 void page_disable();
+void setup_pages(uint32_t *addr, size_t page_num);

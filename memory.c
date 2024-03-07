@@ -1,8 +1,9 @@
 #include "memory.h"
 #include "stddef.h"
 #include "stdint.h"
+#include "lib.h"
 
-extern char memcho_start, freearea;
+extern uint32_t memcho_start, freearea;
 extern memstat memcho[4096];
 
 void init_memory()

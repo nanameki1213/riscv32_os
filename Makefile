@@ -10,14 +10,14 @@ OBJDUMP	= $(ADDNAME)objdump
 RANLIB 	= $(ADDNAME)ranlib
 STRIP  	= $(ADDNAME)strip
 
-OBJS = start.o intr.o main.o lib.o uart.o vector.o interrupt.o plic.o timer.o
+OBJS = start.o intr.o intr_handler.o main.o lib.o uart.o vector.o interrupt.o plic.o timer.o
 OBJS += page.o memcho.o memory.o virt.o virt_disk.o
 
 TARGET = testboot
 
-CFLAGS = -O0 -I. -march=rv32gc
+CFLAGS = -O0 -march=rv32gc -Wno-builtin-declaration-mismatch
 
-LFLAGS = -m elf32lriscv -b elf32-littleriscv -nostdlib --no-relax
+LFLAGS = -m elf32lriscv -b elf32-littleriscv --no-relax -nostdlib
 
 all : $(TARGET)
 

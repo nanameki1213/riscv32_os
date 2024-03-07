@@ -59,7 +59,7 @@ end:
   va_end(vargs);
 }
 
-int putc(unsigned char c)
+int putc(const unsigned char c)
 {
   // 改行文字の場合はCRLF(\r\n)にして送信
   if(c == '\n') {
@@ -72,7 +72,7 @@ int putc(unsigned char c)
   return 0;
 }
 
-int puts(char *s)
+int puts(const char *s)
 {
   while(*s != '\0') {
     putc(*s);
@@ -111,7 +111,7 @@ size_t strlen(const char *s)
   size_t len = 0;
   while(*s++)
     len++;
-  
+
   return len;
 }
 
@@ -196,11 +196,4 @@ int memcmp(const void *buf1, const void *buf2, size_t n)
   }
 
   return 0;
-}
-
-int cpuid()
-{
-  int id;
-  asm volatile ("mv %0, tp" : "=r"(id));
-  return id;
 }

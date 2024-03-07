@@ -13,26 +13,31 @@
 #define VIRT_MMIO_NUM 8
 #define VIRTQ_ENTRY_NUM 32
 #define VIRT_BLK_DEVICEID 2
-#define VIRT_VERSION 0x1
+#define VIRT_VERSION 0x2
 
 #define VIRT_MMIO_MAGIC 0x00
 #define VIRT_MMIO_VERSION 0x04
 #define VIRT_MMIO_DEVICEID 0x08
 #define VIRT_MMIO_VENDERID 0x0c
-#define VIRT_MMIO_HOST_FEATURES 0x10
-#define VIRT_MMIO_HOST_FEATURES_SEL 0x14
-#define VIRT_MMIO_GUEST_FEATURES 0x20
-#define VIRT_MMIO_GUEST_FEATURES_SEL 0x24
-#define VIRT_MMIO_GUEST_PAGE_SIZE 0x28
+#define VIRT_MMIO_DEVICE_FEATURES 0x10
+#define VIRT_MMIO_DEVICE_FEATURES_SEL 0x14
+#define VIRT_MMIO_DRIVER_FEATURES 0x20
+#define VIRT_MMIO_DRIVER_FEATURES_SEL 0x24
 #define VIRT_MMIO_QUEUE_SEL 0x30
 #define VIRT_MMIO_QUEUE_MAX 0x34
 #define VIRT_MMIO_QUEUE_NUM 0x38
-#define VIRT_MMIO_QUEUE_ALIGN 0x3c
-#define VIRT_MMIO_QUEUE_PFN 0x40
+#define VIRT_MMIO_QUEUE_READY 0x44
 #define VIRT_MMIO_QUEUE_NOTIFY 0x50
 #define VIRT_MMIO_INTR_STATUS 0x60
 #define VIRT_MMIO_INTR_ACK 0x64
 #define VIRT_MMIO_STATUS 0x70
+#define VIRT_MMIO_DESC_LOW 0x80
+#define VIRT_MMIO_DESC_HIGH 0x84
+#define VIRT_MMIO_DRIVER_LOW 0x90
+#define VIRT_MMIO_DRIVER_HIGH 0x94
+#define VIRT_MMIO_DEVICE_LOW 0xa0
+#define VIRT_MMIO_DEVICE_HIGH 0xa4
+#define VIRT_MMIO_CONFIG_GENERATION 0xfc
 #define VIRT_MMIO_CONFIG 0x100
 
 #define VIRT_MMIO_STATUS_ACKNOWLEDGE (1<<0)
@@ -75,18 +80,13 @@ struct VRing {
   struct VRingDesc desc[VIRTQ_ENTRY_NUM];
   struct VRingAvail avail;
   struct VRingUsed used;
-  uint32_t num;
-  uint32_t num_default;
-  uint32_t align;
 };
 
 struct VirtQueue {
   struct VRing vring;
-  int desc_idx;
-  int top_desc_idx;
-  unsigned last_used_idx;
-
-  unsigned vq_idx;
+	int queue_index;
+	volatile uint16_t *used_index;
+	uint16_t last_used_index;
 };
 
 #define VIRTIO_BLK_T_IN           0
