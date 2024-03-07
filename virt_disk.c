@@ -2,6 +2,7 @@
 #include "virt.h"
 #include "disk.h"
 #include "lib.h"
+#include "defines.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -15,12 +16,10 @@ struct virtio_blk_config *blk_config;
 int init_virt_disk()
 {
   if(get_virt_mmio(VIRT_MMIO_MAGIC) != 0x74726976) {
-    printf("MAGIC value is ilegal\n");
-    return 1;
+    panic("MAGIC value is ilegal\n");
   }
   if(get_virt_mmio(VIRT_MMIO_DEVICEID) != VIRT_BLK_DEVICEID) {
-    printf("Device ID is ilegal: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
-    return 1;
+    panic("Device ID is ilegal\n");
   }
   printf("デバイスID: %d\n", get_virt_mmio(VIRT_MMIO_DEVICEID));
   // 以下はデバイスの初期化
@@ -55,7 +54,6 @@ int init_virt_disk()
   return 0;
 }
 
-
 void init_disk()
 {
   init_virt_disk();
@@ -80,19 +78,24 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
 	printf("type: %d\n", req->type);
   // ディスクリプタを構築
   printf("request structure addr: 0x%x\n", (intptr_t)req);
+
   struct VRingDesc *desc = common_virt_queue->vring.desc;
-  desc[0].addr = (intptr_t)req;
-  desc[0].len = sizeof(uint32_t) * 2 + sizeof(uint64_t);
-  desc[0].flags = VIRTQ_DESC_F_NEXT;
-  desc[0].next = 1;
-  desc[1].addr = (intptr_t)req + desc[0].len;
-  desc[1].len = SECTOR_SIZE;
-  desc[1].flags = VIRTQ_DESC_F_NEXT | VIRTQ_DESC_F_WRITE;
-  desc[1].next = 2;
-  desc[2].addr = (intptr_t)req + desc[0].len + desc[1].len;
-  desc[2].len = sizeof(uint8_t);
-  desc[2].flags = VIRTQ_DESC_F_WRITE;
-  desc[2].next = 0;
+	int idx = common_virt_queue->queue_index;
+  desc[idx].addr = (intptr_t)req;
+  desc[idx].len = sizeof(uint32_t) * 2 + sizeof(uint64_t);
+  desc[idx].flags = VIRTQ_DESC_F_NEXT;
+  desc[idx].next = 1;
+	idx++;
+  desc[idx].addr = (intptr_t)req + desc[0].len;
+  desc[idx].len = SECTOR_SIZE;
+  desc[idx].flags = VIRTQ_DESC_F_NEXT | VIRTQ_DESC_F_WRITE;
+  desc[idx].next = 2;
+	idx++;
+  desc[idx].addr = (intptr_t)req + desc[0].len + desc[1].len;
+  desc[idx].len = sizeof(uint8_t);
+  desc[idx].flags = VIRTQ_DESC_F_WRITE;
+  desc[idx].next = 0;
+	idx++;
   // ディスクリプタを登録
   // ログを表示
   printf("ディスクリプタテーブルの状態:\n");
@@ -103,7 +106,8 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
     printf("next: %d\n", common_virt_queue->vring.desc[i].next);
   }
 
-  notify_to_device(common_virt_queue);
+  notify_to_device(common_virt_queue, common_virt_queue->queue_index);
+	common_virt_queue->queue_index = idx;
 
   // ログを表示
   printf("使用可能リングの状態:\n");

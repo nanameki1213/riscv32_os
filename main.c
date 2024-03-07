@@ -82,7 +82,7 @@ int main(void)
   char buf[512];
   read_write_disk(buf, 0, 0);
   printf("sector 0 : %s\n", buf);
-
+	read_write_disk(buf, 1, 0);
   // 割込み有効化
   external_intr_enable();
   intr_enable();

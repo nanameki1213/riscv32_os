@@ -85,8 +85,8 @@ struct VRing {
 struct VirtQueue {
   struct VRing vring;
 	int queue_index;
-	volatile uint16_t *used_index;
 	uint16_t last_used_index;
+	uint16_t last_avail_index;
 };
 
 #define VIRTIO_BLK_T_IN           0
@@ -152,6 +152,5 @@ static inline void set_virt_mmio(unsigned offset, uint32_t value)
 
 struct VirtQueue *init_virt_mmio(int index);
 struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write);
-void add_single_desc(struct VirtQueue *queue, struct VRingDesc desc);
-void notify_to_device(struct VirtQueue *queue);
+void notify_to_device(struct VirtQueue *queue, int desc_idx);
 bool is_queue_available(int index);

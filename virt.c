@@ -67,10 +67,10 @@ struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write)
   return &blk_req[blk_req_idx++];
 }
 
-void notify_to_device(struct VirtQueue *queue)
+void notify_to_device(struct VirtQueue *queue, int desc_idx)
 {
   // 使用可能リングを更新
-  queue->vring.avail.ring[queue->vring.avail.idx++] = 0;
+  queue->vring.avail.ring[queue->vring.avail.idx++] = desc_idx;
   // デバイスに通知
 	set_virt_mmio(VIRT_MMIO_QUEUE_NOTIFY, VIRT_DISK_DEFAULT_QUEUE);
 	queue->last_used_index++;
