@@ -254,5 +254,5 @@ void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param)
 {
   current->syscall.type  = type;
   current->syscall.param = param;
-  asm volatile ("trapa #0"); // TODO: riscv用に変更する
+  asm volatile ("ecall"); // TODO: riscv用に変更する
 }

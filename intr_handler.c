@@ -1,7 +1,8 @@
 #include "intr_handler.h"
 #include "lib.h"
+#include "interrupt.h"
 
-void uart(softvec_type_t type, unsigned int sp)
+void uart(softvec_type_t type, unsigned long sp)
 {
   int c;
   static char buf[64];
@@ -35,7 +36,7 @@ void uart(softvec_type_t type, unsigned int sp)
   }
 }
 
-void timer(softvec_type_t type, unsigned int sp)
+void timer(softvec_type_t type, unsigned long sp)
 {
   printf("time up!\n");
   timer_intr_disable();
