@@ -1,8 +1,7 @@
 #pragma once
+typedef short softvec_type_t;
 
-typedef short intr_type_t;
-
-// typedef void (*softvec_handler_t)(softvec_type_t type, unsigned int )
+typedef void (*softvec_handler_t)(softvec_type_t type, unsigned long sp);
 
 void external_intr_enable();
 void external_intr_disable();
@@ -18,4 +17,4 @@ void intr_disable();
 
 int is_intr_enable();
 
-void interrupt(intr_type_t type, unsigned int sp);
+void interrupt(softvec_type_t type, unsigned int sp);

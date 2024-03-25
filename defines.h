@@ -3,6 +3,7 @@
 #define UART_IRQ 10
 
 #include "lib.h"
+#include <stdint.h>
 
 static inline void panic(char *str)
 {
@@ -11,3 +12,7 @@ static inline void panic(char *str)
 		;
 	}
 }
+
+typedef uint32_t kz_thread_id_t;
+typedef int (*kz_func_t)(int argc, char *argv[]);
+typedef void (*kz_handler_t)(void);

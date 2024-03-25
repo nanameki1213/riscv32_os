@@ -80,13 +80,18 @@ int is_intr_enable()
   return 1;
 }
 
-void interrupt(intr_type_t type, unsigned int sp)
+void softvec_setintr(softvec_type_t type, softvec_handler_t handler)
+{
+  
+}
+
+void interrupt(softvec_type_t type, unsigned int sp)
 {
   // 多重割り込み禁止
   intr_disable();
   int id = get_mhartid();
 
-  if(type == INTR_TYPE_EXLINTR) {
+  if(type == SOFTVEC_TYPE_EXLINTR) {
     // PLICに割込みclaimを送信
     int irq = *(uint32_t*)PILC_CLAIM(id);
     if(irq == UART0_IRQ) {
@@ -95,7 +100,7 @@ void interrupt(intr_type_t type, unsigned int sp)
     }
     // PLICにcomplete通知を行う
     *(uint32_t*)PILC_CLAIM(id) = irq;
-  } else if(type == INTR_TYPE_TIMINTR) {
+  } else if(type == SOFTVEC_TYPE_TIMINTR) {
     timer(type, sp);
   }
 

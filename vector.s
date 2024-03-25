@@ -4,21 +4,21 @@
 m_vectors:
   j m_undefined_handler
   .balign 4
-  j m_undefined_handler
+  j intr_software
   .balign 4
   j m_undefined_handler
   .balign 4
-  j m_undefined_handler
-  .balign 4
-  j intr_timer
-  .balign 4
-  j intr_timer
+  j intr_software 
   .balign 4
   j m_undefined_handler
   .balign 4
   j intr_timer
   .balign 4
-  j intr_external
+  j m_undefined_handler
+  .balign 4
+  j intr_timer
+  .balign 4
+  j m_undefined_handler
   .balign 4
   j intr_external
   .balign 4

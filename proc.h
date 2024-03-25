@@ -1,5 +1,8 @@
 #pragma once
 
+#include "defines.h"
+#include "syscall.h"
+
 kz_thread_id_t kz_run(kz_func_t func, char *name, int stacksize,
 											int argc, char *argv[]);
 void kz_exit(void);

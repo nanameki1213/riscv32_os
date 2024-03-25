@@ -1,11 +1,15 @@
-#include "proc.h";
+#include "proc.h"
 #include <ctype.h>
+#include "defines.h"
+#include "syscall.h"
+#include "intr.h"
+#include "interrupt.h"
 
 #define THREAD_NUM 32
 #define THREAD_NAME_SIZE 128
 
 typedef struct _kz_context {
-	uint32 sp;
+	uint32_t sp;
 } kz_context;
 
 typedef struct _kz_thread {
@@ -44,8 +48,8 @@ static int getcurrent(void)
 		return -1;
 	}
 
-	readyqueue.head = current->next;
-	if(readyqueue.head == NULL) {
+	readyque.head = current->next;
+	if(readyque.head == NULL) {
 		readyque.tail = NULL;
 	}
 	current->next = NULL;
@@ -86,12 +90,12 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 {
 	int i;
 	kz_thread *thp;
-	uint32 *sp;
+	uint32_t *sp;
 	extern char userstack;
 	static char *thread_stack = &userstack;
 
 	for(i = 0; i < THREAD_NUM; i++) {
-		thp = &thread[i];
+		thp = &threads[i];
 		if(!thp->init.func) {
 			break;
 		}
@@ -102,7 +106,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 
 	memset(thp, 0, sizeof(*thp));
 
-	sctrcpy(thp->name, name);
+	strcpy(thp->name, name);
 	thp->next = NULL;
 
 	thp->init.func = func;
@@ -114,10 +118,10 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 	
 	thp->stack = thread_stack;
 
-	sp = (uint32*)thp->next;
-  *(--sp) = (uint32)thread_end;
+	sp = (uint32_t*)thp->next;
+  *(--sp) = (uint32_t)thread_end;
 
-  *(--sp) = (uint32)thread_init;
+  *(--sp) = (uint32_t)thread_init;
 
   *(--sp) = 0;
   *(--sp) = 0;
@@ -134,10 +138,10 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
   *(--sp) = 0;
   *(--sp) = 0;
   *(--sp) = 0;
-  *(--sp) = thp;
+  *(--sp) = (uint32_t)thp;
   *(--sp) = 0;
 
-  thp->context.sp = (uint32)sp;
+  thp->context.sp = (uint32_t)sp;
 
   putcurrent();
 
@@ -155,9 +159,10 @@ static int thread_exit()
   return 0;
 }
 
+static void thread_intr(softvec_type_t type, unsigned long sp);
+
 static int setintr(softvec_type_t type, kz_handler_t handler)
 {
-  static void thread_intr(softvec_type_t type, unsigned long sp);
 
   softvec_setintr(type, thread_intr);
 
@@ -191,7 +196,7 @@ static void syscall_proc(kz_syscall_type_t type, kz_syscall_param_t *p)
 static void schedule(void)
 {
   if(!readyque.head) {
-    kz_sysdown();
+    kz_panic();
   }
 
   current = readyque.head;
@@ -232,13 +237,13 @@ void kz_start(kz_func_t func, char *name, int stacksize,
   memset(handlers, 0, sizeof(handlers));
 
   setintr(SOFTVEC_TYPE_SYSCALL, syscall_intr);
-  setintr(SOFTVEC_TYPE_SOFTERR, softerr_intr);
+  // setintr(SOFTVEC_TYPE_SOFTERR, softerr_intr);
 
   current = (kz_thread*)thread_run(func, name, stacksize, argc, argv);
   dispatch(&current->context);
 }
 
-void kz_sysdown(void)
+void kz_panic(void)
 {
   printf("system error!\n");
   while(1)

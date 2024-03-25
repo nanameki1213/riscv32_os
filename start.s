@@ -10,9 +10,8 @@ loop:
 
 .text
 .globl dispatch
-.type dispatch, @function
 dispatch:
-  sw a0, sp
+  sw a0, 0(sp)
   lw a0, 1*8(sp)
   lw a1, 2*8(sp)
   lw a2, 3*8(sp)
@@ -31,3 +30,4 @@ dispatch:
   lw s0, 16*8(sp)
   addi sp, sp, 8*17
   mret
+
