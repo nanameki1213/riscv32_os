@@ -6,7 +6,6 @@
 
 // ブロックデバイスのリクエスト構造体(数はVIRTQ_REQ_MAX_NUMで定義)
 struct virtio_blk_req *blk_req;
-int blk_req_idx = 0;
 // 共通virtキュー(TODO: 複数のキューを扱えるようにする)
 struct VirtQueue *common_virt_queue;
 
@@ -53,18 +52,6 @@ struct VirtQueue *init_virt_mmio(int index)
   blk_req = (struct virtio_blk_req*)alloc_page();
 
   return vq;
-}
-
-// 引数をもとに新たなリクエストを作成
-struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write)
-{
-  blk_req[blk_req_idx].sector = sector;
-  blk_req[blk_req_idx].type = (is_write == 1) ? VIRTIO_BLK_T_IN : VIRTIO_BLK_T_OUT;
-  if(is_write) {
-    memcpy(blk_req[blk_req_idx].data, buf, SECTOR_SIZE);
-  }
-
-  return &blk_req[blk_req_idx++];
 }
 
 void notify_to_device(struct VirtQueue *queue, int desc_idx)

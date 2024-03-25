@@ -151,6 +151,5 @@ static inline void set_virt_mmio(unsigned offset, uint32_t value)
 }
 
 struct VirtQueue *init_virt_mmio(int index);
-struct virtio_blk_req *new_blk_request(int sector, void *buf, int is_write);
 void notify_to_device(struct VirtQueue *queue, int desc_idx);
 bool is_queue_available(int index);

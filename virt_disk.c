@@ -71,46 +71,52 @@ void init_disk()
 void read_write_disk(void *buf, unsigned sector, int is_write)
 {
   // リクエストを構築
-  struct virtio_blk_req *req = new_blk_request(sector, buf, is_write);
+  struct virtio_blk_req *req = blk_req;
+	req->sector = sector;
+	req->type = is_write ? VIRTIO_BLK_T_IN : VIRTIO_BLK_T_OUT;
+	if(is_write) {
+		memcpy(req->data, buf, SECTOR_SIZE);
+	}
 	// ログを表示
-	printf("リクエストを構築\n");
 	printf("sector: %d\n", req->sector);
 	printf("type: %d\n", req->type);
   // ディスクリプタを構築
-  printf("request structure addr: 0x%x\n", (intptr_t)req);
+  // printf("request structure addr: 0x%x\n", (intptr_t)req);
 
   struct VRingDesc *desc = common_virt_queue->vring.desc;
-	int idx = common_virt_queue->queue_index;
-  desc[idx].addr = (intptr_t)req;
-  desc[idx].len = sizeof(uint32_t) * 2 + sizeof(uint64_t);
-  desc[idx].flags = VIRTQ_DESC_F_NEXT;
-  desc[idx].next = 1;
-	idx++;
-  desc[idx].addr = (intptr_t)req + desc[0].len;
-  desc[idx].len = SECTOR_SIZE;
-  desc[idx].flags = VIRTQ_DESC_F_NEXT | VIRTQ_DESC_F_WRITE;
-  desc[idx].next = 2;
-	idx++;
-  desc[idx].addr = (intptr_t)req + desc[0].len + desc[1].len;
-  desc[idx].len = sizeof(uint8_t);
-  desc[idx].flags = VIRTQ_DESC_F_WRITE;
-  desc[idx].next = 0;
-	idx++;
-  // ディスクリプタを登録
+  desc[0].addr = (intptr_t)req;
+  desc[0].len = sizeof(uint32_t) * 2 + sizeof(uint64_t);
+  desc[0].flags = VIRTQ_DESC_F_NEXT;
+  desc[0].next = 1;
+	
+  desc[1].addr = (intptr_t)req + desc[0].len;
+  desc[1].len = SECTOR_SIZE;
+  desc[1].flags = VIRTQ_DESC_F_NEXT;
+	if(!is_write) {
+		desc[1].flags |= VIRTQ_DESC_F_WRITE;
+	}
+  desc[1].next = 2;
+	
+  desc[2].addr = (intptr_t)req + desc[0].len + desc[1].len;
+  desc[2].len = sizeof(uint8_t);
+  desc[2].flags = VIRTQ_DESC_F_WRITE;
+  desc[2].next = 0;
+
   // ログを表示
-  printf("ディスクリプタテーブルの状態:\n");
-  for(int i = 0; i < 3; i++) {
+  // printf("ディスクリプタテーブルの状態:\n");
+  /* for(int i = 0; i < 3; i++) {
     printf("ring[%d]\n", i);
     printf("len: %d\n", common_virt_queue->vring.desc[i].len);
     printf("addr: 0x%x\n", (uint32_t)common_virt_queue->vring.desc[i].addr);
     printf("next: %d\n", common_virt_queue->vring.desc[i].next);
   }
+	*/ 
 
   notify_to_device(common_virt_queue, common_virt_queue->queue_index);
-	common_virt_queue->queue_index = idx;
+	common_virt_queue->queue_index = 3;
 
   // ログを表示
-  printf("使用可能リングの状態:\n");
+  /* printf("使用可能リングの状態:\n");
   printf("avail idx: %d\n", common_virt_queue->vring.avail.idx);
   for(int i = 0; i < common_virt_queue->vring.avail.idx; i++) {
     printf("ring[%d]: %d\n", i, common_virt_queue->vring.avail.ring[i]);
@@ -119,18 +125,16 @@ void read_write_disk(void *buf, unsigned sector, int is_write)
   printf("used idx: %d\n", common_virt_queue->vring.used.idx);
   // 割り込みステータスの状態
   printf("割り込みステータスの状態: 0x%x\n", get_virt_mmio(VIRT_MMIO_INTR_STATUS));
+	*/ 
   // デバイスがリクエストを処理するまで待機
   while(common_virt_queue->last_used_index != common_virt_queue->vring.used.idx) {
 		;
 	}
-  // while(get_virt_mmio(VIRT_MMIO_INTR_STATUS) != 0x1) {
-  //   ;
-  // }
-  printf("処理完了: %d\n", common_virt_queue->vring.used.idx);
+  // printf("処理完了: %d\n", common_virt_queue->vring.used.idx);
 
   if(req->status == VIRTIO_BLK_S_IOERR ||
      req->status == VIRTIO_BLK_S_UNSUPP) {
-    printf("エラー発生\n");
+		panic("ディスク: エラー発生\n");
   }
 
   if(is_write == 0) {
