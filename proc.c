@@ -123,7 +123,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 
   // *(--sp) = (uint32_t)thread_init;
 
-  *(--sp) = (uint32_t)thread_init;;
+  *(--sp) = (uint32_t)thread_init;
   *(--sp) = 0;
   *(--sp) = 0;
   *(--sp) = 0;
