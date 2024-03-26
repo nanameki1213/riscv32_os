@@ -28,6 +28,6 @@ dispatch:
   lw t5, 14*8(sp)
   lw t6, 15*8(sp)
   lw s0, 16*8(sp)
-  addi sp, sp, 8*17
+  lw ra, 17*8(sp)
   ret
 

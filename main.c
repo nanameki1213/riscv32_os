@@ -74,7 +74,6 @@ int main(void)
   softvec_setintr(SOFTVEC_TYPE_TIMINTR, timer);
   
 	// 割込み有効化
-  intr_enable();
   external_intr_enable();
   uart_intr_recv_enable();
 

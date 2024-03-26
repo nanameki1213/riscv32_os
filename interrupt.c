@@ -28,8 +28,6 @@ void external_intr_disable()
 void timer_intr_enable()
 {
   set_mie(get_mie() | MIE_MTIE | xIE_STIE);
-
-  // set_mstatus(get_mstatus() | MSTATUS_MIE | MSTATUS_SIE);
 }
 
 // タイマ割込み無効化
@@ -59,6 +57,7 @@ void intr_enable()
   // set_sip(get_sip() & ~(MIP_MEIP | MIP_MTIP | MIP_MSIP));
   set_mip(get_mip() & ~(MIP_MEIP | MIP_MTIP | MIP_MSIP | xIP_SEIP | xIP_STIP | xIP_SSIP));
 
+  // タイマ割込みは現在有効にすると動作開始してしまうためつかうときだけ有効にする
   // set_sie(get_sie() | xIE_SEIE | xIE_STIE | xIE_SSIE);
   // set_mie(get_mie() | MIE_MEIE | MIE_MTIE | MIE_MSIE | xIE_SEIE | xIE_STIE | xIE_SSIE);
 

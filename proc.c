@@ -118,11 +118,12 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 	
 	thp->stack = thread_stack;
 
-	sp = (uint32_t*)thp->next;
-  *(--sp) = (uint32_t)thread_end;
+	sp = (uint32_t*)thp->stack;
+  // *(--sp) = (uint32_t)thread_end;
 
-  *(--sp) = (uint32_t)thread_init;
+  // *(--sp) = (uint32_t)thread_init;
 
+  *(--sp) = (uint32_t)thread_init;;
   *(--sp) = 0;
   *(--sp) = 0;
   *(--sp) = 0;
@@ -139,7 +140,6 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
   *(--sp) = 0;
   *(--sp) = 0;
   *(--sp) = (uint32_t)thp;
-  *(--sp) = 0;
 
   thp->context.sp = (uint32_t)sp;
 
