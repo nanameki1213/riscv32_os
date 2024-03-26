@@ -4,6 +4,7 @@
 #include "syscall.h"
 #include "intr.h"
 #include "interrupt.h"
+#include "riscv.h"
 
 #define THREAD_NUM 32
 #define THREAD_NAME_SIZE 128
@@ -80,6 +81,7 @@ static void thread_end(void)
 
 static void thread_init(kz_thread *thp)
 {
+  printf("thread_init started\n");
 	thp->init.func(thp->init.argc, thp->init.argv);
 	thread_end();
 }
@@ -115,7 +117,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name,
 
 	memset(thread_stack, 0, stacksize);
 	thread_stack += stacksize;
-	
+
 	thp->stack = thread_stack;
 
 	sp = (uint32_t*)thp->stack;
@@ -240,6 +242,7 @@ void kz_start(kz_func_t func, char *name, int stacksize,
   // setintr(SOFTVEC_TYPE_SOFTERR, softerr_intr);
 
   current = (kz_thread*)thread_run(func, name, stacksize, argc, argv);
+
   dispatch(&current->context);
 }
 
@@ -254,5 +257,6 @@ void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param)
 {
   current->syscall.type  = type;
   current->syscall.param = param;
-  asm volatile ("ecall"); // TODO: riscv用に変更する
+  // ソフトウェア割り込みを発生させる
+  set_mip(get_mip() | MIP_MSIP | xIP_SSIP);
 }

@@ -12,7 +12,7 @@ STRIP  	= $(ADDNAME)strip
 
 OBJS = start.o intr.o intr_handler.o main.o lib.o uart.o vector.o interrupt.o plic.o timer.o
 OBJS += page.o memcho.o memory.o virt.o virt_disk.o
-OBJS += proc.o syscall.o
+OBJS += proc.o syscall.o threads.o
 
 TARGET = testboot
 

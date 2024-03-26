@@ -52,6 +52,15 @@ void init()
   set_mtvec((uint32_t)(&m_vectors) | MODE_VECTOR);
   set_stvec((uint32_t)(&s_vectors) | MODE_VECTOR);
 
+  page_enable();
+}
+
+static int start_threads(int argc, char *argv[])
+{
+  kz_run(thread_1_main, "thread_1_main", 0x100, 0, NULL);
+  kz_run(thread_2_main, "thread_2_main", 0x100, 0, NULL);
+
+  return 0;
 }
 
 int main(void)
@@ -75,15 +84,11 @@ int main(void)
   
 	// 割込み有効化
   external_intr_enable();
-  uart_intr_recv_enable();
+  // uart_intr_recv_enable();
 
-  // set_kernel_page();
-  page_enable();
+  // puts("$ ");
 
-  puts("$ ");
-  // start_timer(1000);
-
-  // kz_start(start_threads, "start", 0x100, 0, NULL);
+  kz_start(start_threads, "start", 0x100, 0, NULL);
 
   while(1) {
     ;
