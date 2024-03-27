@@ -2,7 +2,7 @@
 .globl m_vectors
 .balign 256
 m_vectors:
-  j m_undefined_handler
+  j intr_software
   .balign 4
   j intr_software
   .balign 4
@@ -33,13 +33,13 @@ m_undefined_handler:
 .globl s_vectors
 .balign 256
 s_vectors:
-  j s_undefined_handler
+  j intr_software
+  .balign 4
+  j intr_software
   .balign 4
   j s_undefined_handler
   .balign 4
-  j s_undefined_handler
-  .balign 4
-  j s_undefined_handler
+  j intr_software
   .balign 4
   j intr_timer
   .balign 4

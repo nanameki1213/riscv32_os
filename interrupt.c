@@ -97,7 +97,7 @@ void softvec_setintr(softvec_type_t type, softvec_handler_t handler)
 
 void interrupt(softvec_type_t type, unsigned int sp)
 {
-  printf("共通割り込みハンドラ interrupt 突入\n");
+  printf("共通割り込みハンドラ interrupt に入りました: %d\n", (int)type);
   // 多重割り込み禁止
   intr_disable();
   int id = get_mhartid();  

@@ -81,8 +81,9 @@ static void thread_end(void)
 
 static void thread_init(kz_thread *thp)
 {
-  printf("thread_init started\n");
+  printf("thread_init started: %s\n", thp->name);
 	thp->init.func(thp->init.argc, thp->init.argv);
+  printf("threadのmain処理が完了しました\n");
 	thread_end();
 }
 
@@ -90,6 +91,7 @@ static void thread_init(kz_thread *thp)
 static kz_thread_id_t thread_run(kz_func_t func, char *name,
 																 int stacksize, int argc, char *argv[])
 {
+  printf("thread_run started\n");
 	int i;
 	kz_thread *thp;
 	uint32_t *sp;
@@ -255,8 +257,11 @@ void kz_panic(void)
 
 void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param)
 {
+  printf("トラップ割り込み発生\n");
   current->syscall.type  = type;
   current->syscall.param = param;
-  // ソフトウェア割り込みを発生させる
+  // trap
   set_mip(get_mip() | MIP_MSIP | xIP_SSIP);
+  set_sip(get_sip() | xIP_SSIP);
+  printf("なぜここにいる(碇ゲンドウ)\n");
 }

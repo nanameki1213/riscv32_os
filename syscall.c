@@ -5,6 +5,7 @@
 kz_thread_id_t kz_run(kz_func_t func, char *name, int stacksize,
                       int argc, char *argv[])
 {
+  printf("kz_run start\n");
   kz_syscall_param_t param;
   param.un.run.func = func;
   param.un.run.name = name;
@@ -17,5 +18,6 @@ kz_thread_id_t kz_run(kz_func_t func, char *name, int stacksize,
 
 void kz_exit(void)
 {
+  printf("kz_exit start\n");
   kz_syscall(KZ_SYSCALL_TYPE_EXIT, NULL);
 }
